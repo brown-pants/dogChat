@@ -1,0 +1,31 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/qss/StyleSheet.css</file>
+        <file>res/img/Plus.png</file>
+        <file>res/img/X.png</file>
+        <file>res/img/Minus.png</file>
+        <file>res/img/Square.png</file>
+        <file>res/img/X_white.png</file>
+        <file>res/img/Search.png</file>
+        <file>res/img/Substract.png</file>
+        <file>res/img/Comment.png</file>
+        <file>res/img/User.png</file>
+        <file>res/img/Shocked.png</file>
+        <file>res/emoji/emoji.txt</file>
+        <file>res/gif/anim2.gif</file>
+        <file>res/gif/anim3.gif</file>
+        <file>res/gif/anim4.gif</file>
+        <file>res/gif/anim5.gif</file>
+        <file>res/gif/anim1.gif</file>
+        <file>res/gif/anim6.gif</file>
+        <file>res/gif/anim7.gif</file>
+        <file>res/gif/anim8.gif</file>
+        <file>res/gif/anim9.gif</file>
+        <file>res/gif/anim10.gif</file>
+        <file>res/img/exclamation.png</file>
+        <file>res/img/Image.png</file>
+        <file>res/img/Folder.png</file>
+        <file>res/gif/anim11.gif</file>
+        <file>res/img/User_black.png</file>
+    </qresource>
+</RCC>

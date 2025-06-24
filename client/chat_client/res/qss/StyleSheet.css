@@ -1,0 +1,340 @@
+/***************
+    全局样式表
+***************/
+
+/* 列表 */
+QListView
+{
+    border-style:none;
+    outline: none;
+}
+
+QListView::item
+{
+    border: none;
+}
+
+/*  菜单  */
+QMenu
+{
+    background-color: rgba(255, 255, 255, 255);
+    padding: 4px;
+    border-radius: 3px;
+}
+
+QMenu::item
+{
+    background-color: transparent;
+    padding: 6px 10px 6px 10px;
+    margin: 2px 2px;
+    border-radius: 3px;
+}
+
+QMenu::item:selected
+{
+    background-color: #e6f2ff;
+    color: #0066cc;
+}
+
+QMenu::separator
+{
+    height: 1px;
+    background: #e0e0e0;
+    margin: 4px 0;
+}
+
+/*  滑块  */
+QScrollBar:vertical
+{
+    background: transparent;
+    padding: 0px;
+    border-radius:4px;
+    max-width:8px;
+}
+
+QScrollBar::handle:vertical
+{
+    background: rgb(185, 189, 192);
+    min-height:50px;
+    border-radius:4px;
+}
+
+QScrollBar::handle:vertical:hover
+{
+    background: rgb(165, 169, 172);
+}
+
+QScrollBar::handle:vertical:pressed
+{
+    background:rgb(155, 159, 162);
+}
+
+QScrollBar::add-page:vertical
+{
+    background:none;
+}
+
+QScrollBar::sub-page:vertical
+{
+    background:none;
+}
+
+QScrollBar::add-line:vertical{
+    background:none;
+}
+
+QScrollBar::sub-line:vertical{
+    background:none;
+}
+
+/*  搜索框 */
+#searchWidget
+{
+    background-color: rgb(239, 240, 241);
+}
+
+#searchWidget QPushButton
+{
+    border: none;
+    border-radius: 5px;
+    background-color: rgb(225, 227, 230);
+}
+
+#searchWidget QPushButton:hover
+{
+    background-color: rgb(205, 207, 210);
+}
+
+#searchWidget QPushButton:pressed
+{
+    background-color: rgb(195, 197, 190);
+}
+
+#searchWidget QLineEdit
+{
+    border: none;
+    border-radius: 5px;
+    background-color: rgb(225, 227, 230);
+}
+
+#searchWidget QLineEdit:hover
+{
+    background-color: rgb(205, 207, 210);
+}
+
+#searchWidget QLineEdit:pressed
+{
+    background-color: rgb(195, 197, 190);
+}
+
+/*  标题栏 */
+#titleWidget
+{
+    background-color: rgb(246, 246, 247);
+    border: 1px solid rgb(230, 231, 232);
+    border-top: none;
+    border-right: none;
+}
+
+/*  右侧列表  */
+#rightStackedWidget QListWidget
+{
+    border-left: 1px solid rgb(230, 231, 232);
+}
+
+#homePage
+{
+    background-color: rgb(246, 246, 247);
+    border-bottom-right-radius: 10px;
+}
+
+/*  编辑消息窗体   */
+#editMsgWidget
+{
+    background-color: rgb(246, 246, 247);
+    border: 1px solid rgb(230, 231, 232);
+    border-right: none;
+    border-bottom: none;
+}
+
+#editMsgWidget QTextEdit
+{
+    border: none;
+    background-color: rgb(246, 246, 247);
+}
+
+/*  消息发送工具  */
+#sendToolWidget QPushButton
+{
+    border: none;
+    border-radius: 5px;
+    background-color: transparent;
+}
+
+#sendToolWidget QPushButton:hover
+{
+    background-color: rgb(205, 207, 210);
+}
+
+#sendToolWidget QPushButton:pressed
+{
+    background-color: rgb(195, 197, 190);
+}
+
+/*  消息发送窗口  */
+#sendWidget
+{
+    background-color: rgb(246, 246, 247);
+    border-bottom-right-radius: 10px;
+}
+
+/*  消息发送按钮  */
+#sendButton
+{
+    border-radius: 10px;
+    background-color: rgb(200, 230, 250);
+}
+
+#sendButton:hover
+{
+    background-color: rgb(180, 211, 235);
+}
+
+#sendButton:pressed
+{
+    background-color: rgb(170, 201, 225);
+}
+
+/*  表情选择窗口  */
+#ChooseEmojiWidget #shadowWidget
+{
+    background-color: rgb(255, 255, 255);
+    border-radius: 10px;
+}
+
+#ChooseEmojiWidget QPushButton
+{
+    border: none;
+    border-radius: 5px;
+    background-color: transparent;
+}
+
+#ChooseEmojiWidget QPushButton:hover,
+#ChooseEmojiWidget QPushButton:checked
+{
+    background-color: rgb(205, 207, 210);
+}
+
+#ChooseEmojiWidget QPushButton:pressed
+{
+    background-color: rgb(195, 197, 190);
+}
+
+/*  控制栏 */
+#controlWidget #backgroundWidget
+{
+    border-top-right-radius: 10px;
+    border: 1px solid rgb(230, 231, 232);
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+}
+
+#controlWidget QPushButton
+{
+    border: none;
+    border-radius: 0px;
+    background-color: none;
+}
+
+#controlWidget #maximizeButton:hover, #minimizeButton:hover
+{
+    background-color: rgb(230, 231, 232);
+}
+
+#controlWidget #maximizeButton:pressed, #minimizeButton:pressed
+{
+    background-color: rgb(210, 211, 212);
+}
+
+#controlWidget #closeButton:hover
+{
+    background-color: rgb(240, 74, 62);
+    icon: url(:/res/img/X_white.png);
+    border-top-right-radius: 10px;
+}
+
+#controlWidget #closeButton:pressed
+{
+    background: rgb(193, 60, 51);
+}
+
+#MainWnd #controlWidget #backgroundWidget
+{
+    background: rgb(246, 246, 247);
+}
+
+/*  聊天列表窗口和好友列表窗口  */
+#ChatListWidget QListWidget,
+#FriendListWidget QListWidget
+{
+    background: rgb(239, 240, 241);
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#ChatListWidget QListWidget::item,
+#FriendListWidget QListWidget::item
+{
+    border-radius: 6px;
+}
+
+#ChatListWidget QListWidget::item:hover,
+#FriendListWidget QListWidget::item:hover
+{
+    background: rgb(225, 227, 230);
+}
+
+#ChatListWidget QListWidget::item:selected,
+#FriendListWidget QListWidget::item:selected
+{
+    background: rgb(218, 228, 240);
+}
+
+/*  聊天窗口    */
+#ChatWidget QListWidget
+{
+    background: rgb(246, 246, 247);
+}
+
+/*  左侧窗口    */
+#leftWidget
+{
+    background-color: rgb(57, 117, 198);
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+#leftWidget QPushButton
+{
+    border: none;
+    border-radius: 10px;
+    background-color: transparent;
+}
+
+#leftWidget QPushButton:hover,
+#leftWidget QPushButton:checked
+{
+    background-color: rgba(200, 200, 200, 50);
+}
+
+#leftWidget QPushButton:pressed
+{
+    background-color: rgba(200, 200, 200, 80);
+}
+
+#exclamationButton
+{
+    background-color: transparent;
+    border: none;
+}
