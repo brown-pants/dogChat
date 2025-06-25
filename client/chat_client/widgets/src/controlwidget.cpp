@@ -28,6 +28,8 @@ bool ControlWidget::eventFilter(QObject *watched, QEvent *event)
     // 控制窗口移动时还原大小                                  尝试上锁
     if (event->type() == QEvent::Move && !isNormalState && mutex.tryLock())
     {
+        emit normalized();
+
         QSize maximizeSize = controlWnd->size();
         QPoint cursorPos = QCursor::pos() + QPoint(WINDOW_SHADOW_WIDTH, WINDOW_SHADOW_WIDTH);
 
