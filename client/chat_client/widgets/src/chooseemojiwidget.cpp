@@ -25,11 +25,15 @@ ChooseEmojiWidget::ChooseEmojiWidget(QWidget *parent)
     ui->animEmojiButton->setCheckable(true);
     ui->charEmojiButton->setChecked(true);
 
+    // 设置外边框阴影参数
+    int shadowWidth = 20;
+    layout()->setContentsMargins(shadowWidth, shadowWidth, shadowWidth, shadowWidth);
+
     //设置外边框阴影
     QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
     shadow->setOffset(0, 0);
     shadow->setColor(QColor(120, 120, 120));
-    shadow->setBlurRadius(WINDOW_SHADOW_WIDTH);
+    shadow->setBlurRadius(shadowWidth);
     ui->shadowWidget->setGraphicsEffect(shadow);
 
     // 加载全部表情

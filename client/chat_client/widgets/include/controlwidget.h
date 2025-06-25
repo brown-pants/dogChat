@@ -23,6 +23,10 @@ public:
 
     void setControlWnd(QWidget *w);
 
+signals:
+    void maximized();
+    void normalized();
+
 protected:
     bool eventFilter(QObject *watched, QEvent *event);
 

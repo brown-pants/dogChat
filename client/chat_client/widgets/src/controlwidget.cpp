@@ -2,6 +2,7 @@
 #include "ui_controlwidget.h"
 #include <QPixmap>
 #include <QMutex>
+#include <QScreen>
 
 QMutex mutex;
 
@@ -28,10 +29,9 @@ bool ControlWidget::eventFilter(QObject *watched, QEvent *event)
     // 控制窗口移动时还原大小                                  尝试上锁
     if (event->type() == QEvent::Move && !isNormalState && mutex.tryLock())
     {
-        emit normalized();
-
         QSize maximizeSize = controlWnd->size();
-        QPoint cursorPos = QCursor::pos() + QPoint(WINDOW_SHADOW_WIDTH, WINDOW_SHADOW_WIDTH);
+        int shadowWidth = controlWnd->property("shadowWidth").toInt();
+        QPoint cursorPos = QCursor::pos() + QPoint(shadowWidth, shadowWidth);
 
         double xRatio = static_cast<double>(cursorPos.x()) / maximizeSize.width();
         double yRatio = static_cast<double>(cursorPos.y()) / maximizeSize.height();
@@ -39,8 +39,9 @@ bool ControlWidget::eventFilter(QObject *watched, QEvent *event)
         int x = cursorPos.x() - static_cast<int>(xRatio * wndNormalGeometry.width());
         int y = cursorPos.y() - static_cast<int>(yRatio * wndNormalGeometry.height());
 
-        controlWnd->move(x - 2 * WINDOW_SHADOW_WIDTH, y - WINDOW_SHADOW_WIDTH);
+        controlWnd->move(x - 2 * shadowWidth, y - shadowWidth);
         controlWnd->resize(wndNormalGeometry.size());
+        emit normalized();
 
         isNormalState = true;
         ui->maximizeButton->setIcon(maximizeIcon);
@@ -77,12 +78,10 @@ void ControlWidget::on_maximizeButton_clicked()
         wndNormalGeometry = controlWnd->geometry();
 
         // 窗口最大化
-        controlWnd->showMaximized();
-        int width = controlWnd->width();
-        int height = controlWnd->height();
-        controlWnd->showNormal();
-        controlWnd->resize(width + WINDOW_SHADOW_WIDTH * 2, height + WINDOW_SHADOW_WIDTH * 2);
-        controlWnd->move(-WINDOW_SHADOW_WIDTH, -WINDOW_SHADOW_WIDTH);
+        QScreen *screen = QGuiApplication::primaryScreen();
+        QRect availableGeometry = screen->availableGeometry();
+        controlWnd->setGeometry(availableGeometry);
+        emit maximized();
 
         isNormalState = false;
         ui->maximizeButton->setIcon(normalIcon);
@@ -100,6 +99,7 @@ void ControlWidget::on_maximizeButton_clicked()
         controlWnd->setGeometry(wndNormalGeometry);
         isNormalState = true;
         ui->maximizeButton->setIcon(maximizeIcon);
+        emit normalized();
 
         // 重绘窗口
         controlWnd->resize(controlWnd->size() + QSize(1, 1));

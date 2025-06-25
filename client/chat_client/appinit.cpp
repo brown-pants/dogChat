@@ -71,6 +71,7 @@ bool AppInit::eventFilter(QObject *obj, QEvent *event)
     }
     else if (event->type() == QEvent::MouseMove)
     {
+        int shadowWidth = w->property("shadowWidth").toInt();
         if (lPressed)
         {
             // 鼠标在边缘区域，则调整窗口大小
@@ -84,24 +85,24 @@ bool AppInit::eventFilter(QObject *obj, QEvent *event)
                     int newWidth = w->geometry().right() - mouseGlobPos.x();
                     if (newWidth >= w->minimumWidth() && newWidth <= w->maximumWidth())
                     {
-                        newGeometry.setLeft(mouseGlobPos.x() - WINDOW_SHADOW_WIDTH);
+                        newGeometry.setLeft(mouseGlobPos.x() - shadowWidth);
                     }
                 }
                 if (resizeArea & ResizeRight)
                 {
-                    newGeometry.setRight(mouseGlobPos.x() + WINDOW_SHADOW_WIDTH);
+                    newGeometry.setRight(mouseGlobPos.x() + shadowWidth);
                 }
                 if (resizeArea & ResizeTop)
                 {
                     int newHeight = w->geometry().bottom() - mouseGlobPos.y();
                     if (newHeight >= w->minimumHeight() && newHeight <= w->maximumHeight())
                     {
-                        newGeometry.setTop(mouseGlobPos.y() - WINDOW_SHADOW_WIDTH);
+                        newGeometry.setTop(mouseGlobPos.y() - shadowWidth);
                     }
                 }
                 if (resizeArea & ResizeBottom)
                 {
-                    newGeometry.setBottom(mouseGlobPos.y() + WINDOW_SHADOW_WIDTH);
+                    newGeometry.setBottom(mouseGlobPos.y() + shadowWidth);
                 }
 
                 w->setGeometry(newGeometry);
@@ -117,8 +118,8 @@ bool AppInit::eventFilter(QObject *obj, QEvent *event)
         else if (canResize)
         {
             // 检测鼠标是否在边缘区域
-            const int borderOffset = WINDOW_SHADOW_WIDTH - 5;
-            const int borderWidth = WINDOW_SHADOW_WIDTH + 5;
+            const int borderOffset = shadowWidth - 5;
+            const int borderWidth = shadowWidth + 5;
             QPoint mousePos = mouse_event->pos();
             resizeArea = ResizeNone;
 

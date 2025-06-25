@@ -15,8 +15,6 @@ INCLUDEPATH += \
     widgets/include/ \
     ../3rdparty/
 
-PRECOMPILED_HEADER = pch.h
-
 SOURCES += \
     main.cpp \
     appinit.cpp \
@@ -34,7 +32,6 @@ SOURCES += \
 
 HEADERS += \
     appinit.h \
-    pch.h \
     util/include/util.h \
     widgets/include/friendlistitem.h \
     widgets/include/friendlistwidget.h \
@@ -82,5 +79,5 @@ BUILD_PATH = $$clean_path($$OUT_PWD/..)
 win32 {
     LIBS += $${BUILD_PATH}/3rdparty/pinyin4cpp/$${BUILD_TYPE}/libpinyin4cpp.a
 } else {
-    LIBS += -L$${BUILD_PATH}/3rdparty/pinyin4cpp/$${BUILD_TYPE}/-lpinyin4cpp
+    LIBS += $${BUILD_PATH}/3rdparty/pinyin4cpp/libpinyin4cpp.so
 }

@@ -1,7 +1,7 @@
 #include "mainwnd.h"
 #include "ui_mainwnd.h"
 #include "chatlistwidget.h"
-#include "chatWidget.h"
+#include "chatwidget.h"
 #include "friendlistwidget.h"
 
 #include <QGraphicsDropShadowEffect>
@@ -21,11 +21,16 @@ MainWnd::MainWnd(QWidget *parent)
     setProperty("canMove", true);
     setProperty("canResize", true);
 
+    // 设置外边框阴影参数
+    int shadowWidth = 20;
+    setProperty("shadowWidth", shadowWidth);
+    layout()->setContentsMargins(shadowWidth, shadowWidth, shadowWidth, shadowWidth);
+
     // 设置外边框阴影
     QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
     shadow->setOffset(0, 0);
     shadow->setColor(QColor(50, 50, 50));
-    shadow->setBlurRadius(WINDOW_SHADOW_WIDTH);
+    shadow->setBlurRadius(shadowWidth);
     ui->shadowWidget->setGraphicsEffect(shadow);
 
     // 设置分离器鼠标样式
@@ -63,6 +68,16 @@ MainWnd::MainWnd(QWidget *parent)
     ui->chatButton->setCheckable(true);
     ui->friendButtom->setCheckable(true);
     ui->chatButton->setChecked(true);
+
+    connect(ui->controlWidget, &ControlWidget::maximized, [this]() {
+        layout()->setContentsMargins(0, 0, 0, 0);
+        setProperty("shadowWidth", -5);
+    });
+
+    connect(ui->controlWidget, &ControlWidget::normalized, [this, shadowWidth]() {
+        layout()->setContentsMargins(shadowWidth, shadowWidth, shadowWidth, shadowWidth);
+        setProperty("shadowWidth", shadowWidth);
+    });
 }
 
 MainWnd::~MainWnd()

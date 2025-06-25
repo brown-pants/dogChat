@@ -1,5 +1,6 @@
 #include "util.h"
 #include "pinyin4cpp/PinyinHelper.h"
+#include <QDebug>
 
 char Util::GetInitial(const QString &str)
 {
