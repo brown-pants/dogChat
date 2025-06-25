@@ -71,6 +71,9 @@ bool AppInit::eventFilter(QObject *obj, QEvent *event)
     }
     else if (event->type() == QEvent::MouseMove)
     {
+#if defined(__unix__)
+        w->update();
+#endif
         int shadowWidth = w->property("shadowWidth").toInt();
         if (lPressed)
         {

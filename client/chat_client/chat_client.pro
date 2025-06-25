@@ -64,17 +64,16 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     qrc.qrc
 
-# BUILD_TYPE: [debug] [release]
 CONFIG(debug, debug|release) {
     BUILD_TYPE = debug
-}
-else {
+} else {
     BUILD_TYPE = release
 }
 
 # 3rdparty
 win32 {
-    LIBS += $$PINYIN4CPP_OUT_PWD/libpinyin4cpp.a
-} else {
-    LIBS += $$PINYIN4CPP_OUT_PWD/libpinyin4cpp.so
+    LIBS += -L$$OUT_PWD/../3rdparty/pinyin4cpp/$$BUILD_TYPE -lpinyin4cpp
+}
+unix {
+    LIBS += -L$$OUT_PWD/../3rdparty/pinyin4cpp -lpinyin4cpp
 }
