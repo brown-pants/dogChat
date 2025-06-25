@@ -1,3 +1,8 @@
+/*  ------------------------------------
+ *      表情选择界面类
+ *  ------------------------------------
+ */
+
 #ifndef CHOOSEEMOJIWIDGET_H
 #define CHOOSEEMOJIWIDGET_H
 

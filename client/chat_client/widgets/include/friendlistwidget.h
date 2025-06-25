@@ -1,3 +1,8 @@
+/*  ------------------------------------
+ *      好友列表类
+ *  ------------------------------------
+ */
+
 #ifndef FRIENDLISTWIDGET_H
 #define FRIENDLISTWIDGET_H
 

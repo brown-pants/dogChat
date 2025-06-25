@@ -72,12 +72,9 @@ else {
     BUILD_TYPE = release
 }
 
-# BUILD_PATH = xxx\build\xxx
-BUILD_PATH = $$clean_path($$OUT_PWD/..)
-
 # 3rdparty
 win32 {
-    LIBS += $${BUILD_PATH}/3rdparty/pinyin4cpp/$${BUILD_TYPE}/libpinyin4cpp.a
+    LIBS += $$PINYIN4CPP_OUT_PWD/libpinyin4cpp.a
 } else {
-    LIBS += $${BUILD_PATH}/3rdparty/pinyin4cpp/libpinyin4cpp.so
+    LIBS += $$PINYIN4CPP_OUT_PWD/libpinyin4cpp.so
 }

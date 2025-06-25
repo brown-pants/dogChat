@@ -39,3 +39,7 @@ unix {
 
 RESOURCES += \
     res.qrc
+
+# ------------OUT_PWD------------
+PINYIN4CPP_OUT_PWD = $$OUT_PWD
+export(PINYIN4CPP_OUT_PWD)

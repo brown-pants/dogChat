@@ -2,6 +2,7 @@
  *      聊天界面类
  *  ------------------
  */
+
 #ifndef CHATWIDGET_H
 #define CHATWIDGET_H
 
