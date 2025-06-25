@@ -29,6 +29,8 @@ bool ControlWidget::eventFilter(QObject *watched, QEvent *event)
     // 控制窗口移动时还原大小                                  尝试上锁
     if (event->type() == QEvent::Move && !isNormalState && mutex.tryLock())
     {
+        emit normalized();
+
         QSize maximizeSize = controlWnd->size();
         int shadowWidth = controlWnd->property("shadowWidth").toInt();
         QPoint cursorPos = QCursor::pos() + QPoint(shadowWidth, shadowWidth);
@@ -41,7 +43,6 @@ bool ControlWidget::eventFilter(QObject *watched, QEvent *event)
 
         controlWnd->move(x - 2 * shadowWidth, y - shadowWidth);
         controlWnd->resize(wndNormalGeometry.size());
-        emit normalized();
 
         isNormalState = true;
         ui->maximizeButton->setIcon(maximizeIcon);
@@ -67,13 +68,14 @@ void ControlWidget::on_closeButton_clicked()
     controlWnd->close();
 }
 
-
 void ControlWidget::on_maximizeButton_clicked()
 {
     if (controlWnd == nullptr) return;
 
     if (isNormalState)
     {
+        emit maximized();
+
         // 获取最大化前的大小
         wndNormalGeometry = controlWnd->geometry();
 
@@ -81,7 +83,6 @@ void ControlWidget::on_maximizeButton_clicked()
         QScreen *screen = QGuiApplication::primaryScreen();
         QRect availableGeometry = screen->availableGeometry();
         controlWnd->setGeometry(availableGeometry);
-        emit maximized();
 
         isNormalState = false;
         ui->maximizeButton->setIcon(normalIcon);
@@ -92,6 +93,8 @@ void ControlWidget::on_maximizeButton_clicked()
     }
     else
     {
+        emit normalized();
+
         // 上锁(防止触发事件过滤器中的窗口移动事件)
         mutex.lock();
 
@@ -99,7 +102,6 @@ void ControlWidget::on_maximizeButton_clicked()
         controlWnd->setGeometry(wndNormalGeometry);
         isNormalState = true;
         ui->maximizeButton->setIcon(maximizeIcon);
-        emit normalized();
 
         // 重绘窗口
         controlWnd->resize(controlWnd->size() + QSize(1, 1));

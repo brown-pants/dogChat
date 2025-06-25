@@ -16,7 +16,7 @@ QIcon ChatMsgItem::exclamationIcon;
 
 ChatMsgItem::ChatMsgItem(bool myMsg, const QPixmap &profile, QListWidgetItem *listWidgetItem, QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::ChatMsgItem), hover(false), myMsg(myMsg), lastDocHeight(0), bubbleColor(201, 231, 255), listWidgetItem(listWidgetItem)
+    , ui(new Ui::ChatMsgItem), hover(false), myMsg(myMsg), bubbleColor(201, 231, 255), listWidgetItem(listWidgetItem)
 {
     ui->setupUi(this);
 
@@ -98,16 +98,20 @@ void ChatMsgItem::setText(const QString &text)
     // 设置最大宽度
     ui->msgWidget->setMaximumWidth(maxWidth + ui->msgWidget->contentsMargins().left() + ui->msgWidget->contentsMargins().right() + 30);
 
+    // 设置文本高度属性
+    setProperty("lastDocHeight", 0);
+
     // 当文本高度改变时调整布局
     connect(textEdit->document()->documentLayout(), &QAbstractTextDocumentLayout::documentSizeChanged, [this, textEdit]() {
         int docHeight = textEdit->document()->size().height();
+        int lastDocHeight = property("lastDocHeight").toInt();
         if (docHeight != lastDocHeight)
         {
             textEdit->setFixedHeight(docHeight);
             ui->msgWidget->setFixedHeight(docHeight + ui->msgHLayout->contentsMargins().top() + ui->msgHLayout->contentsMargins().bottom());
             listWidgetItem->setSizeHint(QSize(0, ui->msgWidget->height() + ui->mainHLayout->contentsMargins().top() + ui->mainHLayout->contentsMargins().bottom()));
         }
-        lastDocHeight = docHeight;
+        setProperty("lastDocHeight", docHeight);
     });
 }
 
@@ -185,16 +189,13 @@ void ChatMsgItem::setFile(const QString &file_url)
         ui->msgWidget->setStyleSheet(
             "QWidget#msgWidget { background-color: rgb(255, 255, 255); }"
             "QWidget#msgWidget:hover { background-color: rgb(235, 235, 235); }");
-
-        // 设置过滤器(鼠标移入移出三角形变色)
-        ui->msgWidget->installEventFilter(this);
     }
 
     // 添加文件地址属性
     setProperty("fileUrl", QVariant(file_url));
 
-    // 设置过滤器(鼠标双击打开文件)
-    this->installEventFilter(this);
+    // 设置过滤器(鼠标双击打开文件 & 鼠标移入移出变底色)
+    ui->msgWidget->installEventFilter(this);
 }
 
 void ChatMsgItem::paintEvent(QPaintEvent *e)
@@ -205,6 +206,7 @@ void ChatMsgItem::paintEvent(QPaintEvent *e)
 
     painter.setPen(Qt::transparent);
 
+    // 设置背景色
     if (msgType == FileMsg)
     {
         if (hover)
@@ -223,6 +225,7 @@ void ChatMsgItem::paintEvent(QPaintEvent *e)
 
     QPointF points[3];
 
+    // 计算顶点坐标
     if (myMsg)
     {
         QPoint pos = ui->msgWidget->pos() + QPoint(ui->msgWidget->width(), 0);
@@ -243,25 +246,21 @@ void ChatMsgItem::paintEvent(QPaintEvent *e)
 
 bool ChatMsgItem::eventFilter(QObject *obj, QEvent *event)
 {
-    // 鼠标移入移出
-    if (obj == ui->msgWidget) {
-        if (event->type() == QEvent::Enter)
-        {
-            // 鼠标进入
-            hover = true;
-            update();
-        }
-        else if (event->type() == QEvent::Leave)
-        {
-            // 鼠标离开
-            hover = false;
-            update();
-        }
-    }
-
-    // 双击文件消息可打开文件
-    else if (obj == this && event->type() == QEvent::MouseButtonDblClick && static_cast<QMouseEvent *>(event)->button() == Qt::LeftButton)
+    if (event->type() == QEvent::Enter)
     {
+        // 鼠标进入
+        hover = true;
+        update();
+    }
+    else if (event->type() == QEvent::Leave)
+    {
+        // 鼠标离开
+        hover = false;
+        update();
+    }
+    else if (event->type() == QEvent::MouseButtonDblClick && static_cast<QMouseEvent *>(event)->button() == Qt::LeftButton)
+    {
+        // 双击文件消息可打开文件
         const QString &fileUrl = property("fileUrl").toString();
         if(!QDesktopServices::openUrl(QUrl::fromLocalFile(fileUrl)))
         {

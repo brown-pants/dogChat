@@ -35,10 +35,9 @@ private:
 
     static QIcon exclamationIcon;
 
-    bool hover;
-    bool myMsg;
-    int lastDocHeight;
-    Type msgType;
+    bool hover;     // 鼠标是否在消息框上方
+    bool myMsg;     // 是否是自己发送的消息
+    Type msgType;   // 消息类型
     QColor bubbleColor;
     QListWidgetItem *listWidgetItem;
 };

@@ -102,7 +102,7 @@ void ChatWidget::on_emojiButton_clicked()
 
 void ChatWidget::on_imgButton_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, "选择图像", "", "图像文件 (*.png; *.jpg; *.jpeg; *.bmp; *.gif)");
+    QString fileName = QFileDialog::getOpenFileName(this, "选择图像", "", "图像文件 (*.png *.jpg *.jpeg *.bmp *.gif)");
     if (fileName != "")
     {
         addFileMsg(true, QPixmap("D:\\code\\MyChat\\xjm.gif"), fileName);
