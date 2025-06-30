@@ -374,11 +374,48 @@ LoginWnd QPushButton
     border-radius: 5;
 }
 
+LoginWnd #toLoginButton:hover,
+LoginWnd #toRegisterButton:hover
+{
+    color: rgb(115, 198, 238);
+}
+
+LoginWnd #toSettingButton:hover
+{
+    background-color: rgb(225, 227, 230);
+}
+
+LoginWnd #toLoginButton:pressed,
+LoginWnd #toRegisterButton:pressed
+{
+    color: rgb(100, 150, 200);
+}
+
+LoginWnd #toSettingButton:pressed
+{
+    background-color: rgb(205, 207, 210);
+}
+
 LoginWnd #loginButton,
 LoginWnd #registerButton,
 LoginWnd #settingButton
 {
+    color: rgb(255, 255, 255);
     background-color: rgb(115, 198, 238);
+}
+
+LoginWnd #loginButton:hover,
+LoginWnd #registerButton:hover,
+LoginWnd #settingButton:hover
+{
+    background-color: rgb(105, 188, 228);
+}
+
+LoginWnd #loginButton:pressed,
+LoginWnd #registerButton:pressed,
+LoginWnd #settingButton:pressed
+{
+    background-color: rgb(95, 178, 218);
 }
 
 LoginWnd #accountWidget,

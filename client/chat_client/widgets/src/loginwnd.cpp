@@ -57,7 +57,6 @@ LoginWnd::LoginWnd(QWidget *parent)
     profileButton->resize(80, 80);
     profileButton->move(width() / 2 - shadowWidth - profileButton->width() / 2, ui->topWidget->height() - profileButton->height() / 2);
     profileButton->setIconSize(profileButton->size());
-    profileButton->setIcon(QIcon(":/res/gif/loginbg.gif"));
 
     // 设置头像阴影
     QGraphicsDropShadowEffect *profileShadow = new QGraphicsDropShadowEffect(this);
@@ -209,7 +208,7 @@ void LoginWnd::onFocusChanged(QWidget *old, QWidget *now)
             {
                 ui->passwordIconLabel->setPixmap(LockOpenPixmap);
             }
-            widgets[i]->setStyleSheet("#" + widgets[i]->objectName() + "{border-bottom: 1px solid rgb(100, 150, 200)}");
+            widgets[i]->setStyleSheet("#" + widgets[i]->objectName() + "{border-bottom: 1px solid rgb(100, 150, 200);}");
         }
         else if (old == lineEdits[i])
         {
