@@ -1,5 +1,6 @@
 #include "appinit.h"
 #include "mainwnd.h"
+#include "loginwnd.h".h"
 
 #include <QApplication>
 
@@ -14,6 +15,10 @@ int main(int argc, char *argv[])
 
     MainWnd mainwnd;
     mainwnd.show();
+
+
+    LoginWnd login;
+    login.show();
 
     return a.exec();
 }

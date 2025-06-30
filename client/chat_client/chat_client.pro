@@ -19,6 +19,7 @@ SOURCES += \
     main.cpp \
     appinit.cpp \
     util/src/util.cpp \
+    widgets/src/loginwnd.cpp \
     widgets/src/friendlistitem.cpp \
     widgets/src/friendlistwidget.cpp \
     widgets/src/filemsgwidget.cpp \
@@ -33,6 +34,7 @@ SOURCES += \
 HEADERS += \
     appinit.h \
     util/include/util.h \
+    widgets/include/loginwnd.h \
     widgets/include/friendlistitem.h \
     widgets/include/friendlistwidget.h \
     widgets/include/filemsgwidget.h \
@@ -45,6 +47,7 @@ HEADERS += \
     widgets/include/mainwnd.h
 
 FORMS += \
+    widgets/ui/loginwnd.ui \
     widgets/ui/friendlistitem.ui \
     widgets/ui/friendlistwidget.ui \
     widgets/ui/filemsgwidget.ui \

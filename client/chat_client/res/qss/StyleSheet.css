@@ -142,6 +142,7 @@ QScrollBar::sub-line:vertical{
     border-left: 1px solid rgb(230, 231, 232);
 }
 
+/*  主页  */
 #homePage
 {
     background-color: rgb(246, 246, 247);
@@ -231,8 +232,38 @@ QScrollBar::sub-line:vertical{
 }
 
 /*  控制栏 */
-#controlWidget #backgroundWidget
+ControlWidget QPushButton
 {
+    border: none;
+    border-radius: 0px;
+    background-color: none;
+}
+
+ControlWidget #maximizeButton:hover, #minimizeButton:hover
+{
+    background-color: rgba(230, 231, 232, 190);
+}
+
+ControlWidget #maximizeButton:pressed, #minimizeButton:pressed
+{
+    background-color: rgba(210, 211, 212, 190);
+}
+
+ControlWidget #closeButton:hover
+{
+    background-color: rgb(240, 74, 62);
+    icon: url(:/res/img/X_white.png);
+    border-top-right-radius: 10px;
+}
+
+ControlWidget #closeButton:pressed
+{
+    background: rgb(193, 60, 51);
+}
+
+#MainWnd ControlWidget #backgroundWidget
+{
+    background: rgb(246, 246, 247);
     border-top-right-radius: 10px;
     border: 1px solid rgb(230, 231, 232);
     border-top: none;
@@ -240,38 +271,14 @@ QScrollBar::sub-line:vertical{
     border-bottom: none;
 }
 
-#controlWidget QPushButton
+#LoginWnd ControlWidget #backgroundWidget
 {
-    border: none;
-    border-radius: 0px;
-    background-color: none;
+    border-top-right-radius: 5px;
 }
 
-#controlWidget #maximizeButton:hover, #minimizeButton:hover
+#LoginWnd ControlWidget #closeButton:hover
 {
-    background-color: rgb(230, 231, 232);
-}
-
-#controlWidget #maximizeButton:pressed, #minimizeButton:pressed
-{
-    background-color: rgb(210, 211, 212);
-}
-
-#controlWidget #closeButton:hover
-{
-    background-color: rgb(240, 74, 62);
-    icon: url(:/res/img/X_white.png);
-    border-top-right-radius: 10px;
-}
-
-#controlWidget #closeButton:pressed
-{
-    background: rgb(193, 60, 51);
-}
-
-#MainWnd #controlWidget #backgroundWidget
-{
-    background: rgb(246, 246, 247);
+    border-top-right-radius: 5px;
 }
 
 /*  聊天列表窗口和好友列表窗口  */
@@ -333,8 +340,55 @@ QScrollBar::sub-line:vertical{
     background-color: rgba(200, 200, 200, 80);
 }
 
+/*  感叹号按钮  */
 #exclamationButton
 {
     background-color: transparent;
     border: none;
+}
+
+/*  登录窗口    */
+LoginWnd #loginPage,
+LoginWnd #registerPage,
+LoginWnd #settingPage
+{
+    background-color: rgb(255, 255, 255);
+    border-bottom-left-radius: 5;
+    border-bottom-right-radius: 5;
+}
+
+LoginWnd #titleLabel
+{
+    color: rgb(255, 255, 255);
+}
+
+LoginWnd QLineEdit,
+LoginWnd QLabel
+{
+    border: none;
+}
+
+LoginWnd QPushButton
+{
+    border: none;
+    border-radius: 5;
+}
+
+LoginWnd #loginButton,
+LoginWnd #registerButton,
+LoginWnd #settingButton
+{
+    background-color: rgb(115, 198, 238);
+}
+
+LoginWnd #accountWidget,
+LoginWnd #passwordWidget,
+LoginWnd #userWidget,
+LoginWnd #pwdWidget,
+LoginWnd #rePwdWidget,
+LoginWnd #serverIpWidget,
+LoginWnd #serverPortWidget
+{
+    border: none;
+    border-bottom: 1px solid rgb(180, 180, 180);
 }

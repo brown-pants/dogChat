@@ -27,5 +27,9 @@
         <file>res/img/Folder.png</file>
         <file>res/gif/anim11.gif</file>
         <file>res/img/User_black.png</file>
+        <file>res/gif/loginbg.gif</file>
+        <file>res/img/Lock.png</file>
+        <file>res/img/LockOpen.png</file>
+        <file>res/img/Settings.png</file>
     </qresource>
 </RCC>

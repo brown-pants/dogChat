@@ -24,8 +24,17 @@ void ControlWidget::setControlWnd(QWidget *w)
     controlWnd->installEventFilter(this);
 }
 
+void ControlWidget::hideMaximizeButton()
+{
+    ui->maximizeButton->hide();
+}
+
 bool ControlWidget::eventFilter(QObject *watched, QEvent *event)
 {
+    if (!controlWnd->property("canResize").toBool())
+    {
+        return QWidget::eventFilter(watched, event);
+    }
     // 控制窗口移动时还原大小                                  尝试上锁
     if (event->type() == QEvent::Move && !isNormalState && mutex.tryLock())
     {

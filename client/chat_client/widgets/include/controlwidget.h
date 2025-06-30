@@ -22,6 +22,7 @@ public:
     ~ControlWidget();
 
     void setControlWnd(QWidget *w);
+    void hideMaximizeButton();
 
 signals:
     void maximized();

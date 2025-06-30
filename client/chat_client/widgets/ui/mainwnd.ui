@@ -122,10 +122,6 @@
            <property name="text">
             <string/>
            </property>
-           <property name="icon">
-            <iconset>
-             <normaloff>D:/code/MyChat/xjm.gif</normaloff>D:/code/MyChat/xjm.gif</iconset>
-           </property>
            <property name="iconSize">
             <size>
              <width>40</width>
@@ -146,7 +142,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../qrc.qrc">
+            <iconset resource="../../qrc.qrc">
              <normaloff>:/res/img/Comment.png</normaloff>:/res/img/Comment.png</iconset>
            </property>
            <property name="iconSize">
@@ -169,7 +165,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../qrc.qrc">
+            <iconset resource="../../qrc.qrc">
              <normaloff>:/res/img/User.png</normaloff>:/res/img/User.png</iconset>
            </property>
            <property name="iconSize">
@@ -378,7 +374,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../qrc.qrc"/>
+  <include location="../../qrc.qrc"/>
  </resources>
  <connections/>
 </ui>
