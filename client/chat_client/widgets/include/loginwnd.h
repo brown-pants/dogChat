@@ -1,3 +1,8 @@
+/*  ------------------
+ *      登陆界面类
+ *  ------------------
+ */
+
 #ifndef LOGINWND_H
 #define LOGINWND_H
 

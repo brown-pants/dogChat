@@ -12,12 +12,14 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 INCLUDEPATH += \
     util/include/ \
+    storage/include/ \
     widgets/include/ \
     ../3rdparty/
 
 SOURCES += \
     main.cpp \
     appinit.cpp \
+    storage/src/storagemanager.cpp \
     util/src/util.cpp \
     widgets/src/loginwnd.cpp \
     widgets/src/friendlistitem.cpp \
@@ -33,6 +35,7 @@ SOURCES += \
 
 HEADERS += \
     appinit.h \
+    storage/include/storagemanager.h \
     util/include/util.h \
     widgets/include/loginwnd.h \
     widgets/include/friendlistitem.h \

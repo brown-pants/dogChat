@@ -110,13 +110,13 @@ bool AppInit::eventFilter(QObject *obj, QEvent *event)
 
                 w->setGeometry(newGeometry);
             }
+            // 否则移动窗口
             else if (canMove)
             {
                 QPoint offset = (mouse_event->globalPosition() - mouseGlobalPos).toPoint();
                 w->move(w->pos() + offset);
                 mouseGlobalPos = mouse_event->globalPosition();
             }
-            event->accept();
         }
         else if (canResize)
         {

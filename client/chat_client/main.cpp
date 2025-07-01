@@ -1,6 +1,7 @@
 #include "appinit.h"
 #include "mainwnd.h"
-#include "loginwnd.h".h"
+#include "loginwnd.h"
+#include "storagemanager.h"
 
 #include <QApplication>
 
@@ -19,6 +20,8 @@ int main(int argc, char *argv[])
 
     LoginWnd login;
     login.show();
+
+    StorageManager::GetInstance();
 
     return a.exec();
 }
