@@ -48,7 +48,6 @@ LoginWnd::LoginWnd(QWidget *parent)
     // 设置固定尺寸
     setFixedSize(500, 400);
     ui->shadowWidget->setFixedHeight(height() - 2 * shadowWidth);
-    setFixedHeight(600); // 避免旋转时左右下角被遮挡
     ui->topWidget->setFixedHeight(130);
 
     // 设置控制栏
@@ -79,6 +78,7 @@ LoginWnd::LoginWnd(QWidget *parent)
 
     // 动画结束后正常显示
     connect(rotateAnim, &QPropertyAnimation::finished, [this, shadowWidth](){
+        setFixedSize(500, 400);
         QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
         shadow->setOffset(0, 0);
         shadow->setColor(QColor(50, 50, 50));
@@ -266,6 +266,7 @@ void LoginWnd::onFocusChanged(QWidget *old, QWidget *now)
 
 void LoginWnd::on_toRegisterButton_clicked()
 {
+    setFixedHeight(600); // 避免旋转时左右下角被遮挡
     ui->shadowWidget->hide();
     ui->shadowWidget->setGraphicsEffect(nullptr);
     rotateAnim->setStartValue(rotation);
@@ -276,6 +277,7 @@ void LoginWnd::on_toRegisterButton_clicked()
 
 void LoginWnd::on_toLoginButton_clicked()
 {
+    setFixedHeight(600); // 避免旋转时左右下角被遮挡
     ui->shadowWidget->hide();
     ui->shadowWidget->setGraphicsEffect(nullptr);
     rotateAnim->setStartValue(rotation);
@@ -286,6 +288,7 @@ void LoginWnd::on_toLoginButton_clicked()
 
 void LoginWnd::on_toSettingButton_clicked()
 {
+    setFixedHeight(600); // 避免旋转时左右下角被遮挡
     ui->shadowWidget->hide();
     ui->shadowWidget->setGraphicsEffect(nullptr);
     rotateAnim->setStartValue(rotation);
