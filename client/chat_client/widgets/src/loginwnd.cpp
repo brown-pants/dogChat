@@ -1,12 +1,14 @@
 #include "loginwnd.h"
 #include "ui_loginwnd.h"
+#include "storagemanager.h"
 #include <QGraphicsDropShadowEffect>
 #include <QPainter>
 #include <QPainterPath>
 #include <QMovie>
 #include <QPaintEvent>
+#include <QComboBox>
 #include <QAbstractItemView>
-#include <QListView>
+#include <QFileDialog>
 
 LoginWnd::LoginWnd(QWidget *parent)
     : QWidget(parent)
@@ -83,6 +85,15 @@ LoginWnd::LoginWnd(QWidget *parent)
         shadow->setBlurRadius(shadowWidth);
         ui->shadowWidget->setGraphicsEffect(shadow);
         ui->shadowWidget->show();
+        // 设置头像按钮槽函数
+        if (ui->stackedWidget->currentWidget() == ui->loginPage)
+        {
+            disconnect(profileButton, &QPushButton::pressed, this, &LoginWnd::chooseProfile);
+        }
+        else if (ui->stackedWidget->currentWidget() == ui->registerPage)
+        {
+            connect(profileButton, &QPushButton::pressed, this, &LoginWnd::chooseProfile);
+        }
     });
 
     // 设置事件过滤器(渲染翻转效果)
@@ -91,43 +102,27 @@ LoginWnd::LoginWnd(QWidget *parent)
     // 设置账号下拉框
     ui->accountComboBox->view()->setMaximumHeight(100);
     ui->accountComboBox->view()->parentWidget()->setAttribute(Qt::WA_TranslucentBackground);
+    ui->accountComboBox->addItems(StorageManager::GetInstance().users());
+
+    // 账号改变时更改头像
+    connect(ui->accountComboBox, &QComboBox::currentTextChanged, [this](const QString &curText){
+        QPixmap *profile = StorageManager::GetInstance().profile(curText);
+        if (profile)
+        {
+            profileButton->setIcon(QIcon(*profile));
+        }
+        else
+        {
+            profileButton->setIcon(QIcon());
+        }
+    });
+    emit ui->accountComboBox->currentTextChanged(ui->accountComboBox->currentText());
 
     // 设置事件过滤器(下拉列表位置调整)
     ui->accountComboBox->view()->installEventFilter(this);
 
     // 显示登录页
     ui->stackedWidget->setCurrentWidget(ui->loginPage);
-
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-    ui->accountComboBox->addItem("小鸡毛0");
-
-
 }
 
 LoginWnd::~LoginWnd()
@@ -202,6 +197,7 @@ bool LoginWnd::eventFilter(QObject *obj, QEvent *event)
                 trans.rotate(rotation, Qt::YAxis);
                 ui->loginLeftVLayout->addWidget(ui->toRegisterButton);
                 ui->loginRightGLayout->addWidget(ui->toSettingButton, 1, 1);
+                emit ui->accountComboBox->currentTextChanged(ui->accountComboBox->currentText());
                 profileButton->show();
             }
             // 注册页
@@ -211,6 +207,7 @@ bool LoginWnd::eventFilter(QObject *obj, QEvent *event)
                 trans.rotate(rotation + 180, Qt::YAxis);
                 ui->registerLeftVLayout->addWidget(ui->toLoginButton);
                 ui->registerRightGLayout->addWidget(ui->toSettingButton, 1, 2);
+                profileButton->setIcon(QIcon(registerProfile));
                 profileButton->show();
             }
             // 设置页
@@ -295,6 +292,13 @@ void LoginWnd::on_toSettingButton_clicked()
     rotateAnim->setEndValue(-180);
     rotateAnim->setDuration(800);
     rotateAnim->start();
+}
+
+void LoginWnd::chooseProfile()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, "选择图像", "", "图像文件 (*.png *.jpg *.jpeg *.bmp *.gif)");
+    registerProfile.load(fileName);
+    profileButton->setIcon(QIcon(registerProfile));
 }
 
 

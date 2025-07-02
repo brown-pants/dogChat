@@ -14,6 +14,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     AppInit::Init();
 
+    StorageManager::GetInstance();
+
     MainWnd mainwnd;
     mainwnd.show();
 
@@ -21,7 +23,6 @@ int main(int argc, char *argv[])
     LoginWnd login;
     login.show();
 
-    StorageManager::GetInstance();
 
     return a.exec();
 }

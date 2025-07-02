@@ -1,3 +1,16 @@
+/*  ------------------------------------
+ *      存储管理类
+ *  存储结构:
+ *  root_dir/
+ *      Users/
+ *          user_id/
+ *              profile.jpg
+ *              msg/
+ *                  friend_id.json
+ *          *
+ *  ------------------------------------
+ */
+
 #ifndef STORAGEMANAGER_H
 #define STORAGEMANAGER_H
 
@@ -11,10 +24,15 @@ class StorageManager : public QObject
 public:
     static StorageManager &GetInstance();
 
+    QVector<QString> users() const;
+    QPixmap *profile(const QString user) const;
+
 private:
     explicit StorageManager(QObject *parent = nullptr);
-    QString storageDir;
-    QMap<QString, QPixmap> users_profile;
+    ~StorageManager();
+
+    QString root_dir;
+    QMap<QString, QPixmap *> profileMap;
 };
 
 #endif // STORAGEMANAGER_H

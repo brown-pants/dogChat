@@ -39,6 +39,7 @@ private:
     int rotation;
     QPixmap LockPixmap;
     QPixmap LockOpenPixmap;
+    QPixmap registerProfile;
 
 
 private slots:
@@ -46,6 +47,7 @@ private slots:
     void on_toRegisterButton_clicked();
     void on_toLoginButton_clicked();
     void on_toSettingButton_clicked();
+    void chooseProfile();
 };
 
 #endif // LOGINWND_H
