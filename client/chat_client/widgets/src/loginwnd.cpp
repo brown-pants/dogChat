@@ -90,6 +90,7 @@ LoginWnd::LoginWnd(QWidget *parent)
 
     // 设置账号下拉框
     ui->accountComboBox->view()->setMaximumHeight(100);
+    ui->accountComboBox->view()->parentWidget()->setAttribute(Qt::WA_TranslucentBackground);
 
     // 设置事件过滤器(下拉列表位置调整)
     ui->accountComboBox->view()->installEventFilter(this);

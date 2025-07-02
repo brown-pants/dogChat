@@ -15,13 +15,13 @@ StorageManager::StorageManager(QObject *parent)
 {
     // 设置存储目录
 #if defined(__unix__)
-    storageDir = "~/dogChatFiles/"
+    storageDir = "~/dogChatFiles/";
 #else
     QString documentsPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + '/';
     storageDir = documentsPath;
 #endif
 
-    QString path = documentsPath + "Users";
+    QString path = storageDir + "Users";
     QDirIterator it(path, QDirIterator::Subdirectories);
 
     while (it.hasNext())
