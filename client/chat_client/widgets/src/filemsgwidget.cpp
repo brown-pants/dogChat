@@ -32,6 +32,15 @@ FileMsgWidget::FileMsgWidget(const QString &fileUrl, QWidget *parent)
 
     ui->fileSizeLabel->setText(QString::number(fileSize) + (cnt == 1 ? "B" : cnt == 2 ? "KB" : cnt == 3 ? "MB" : "GB"));
     this->setFixedSize(200, 70);
+
+    // 超出文本范围显示...
+    QFontMetrics metrics(ui->fileNameLabel->font());
+    QString elidedText = metrics.elidedText(fileInfo.fileName(), Qt::ElideRight, ui->fileNameLabel->width());
+    ui->fileNameLabel->setText(elidedText);
+    if(elidedText != fileInfo.fileName())
+    {
+        ui->fileNameLabel->setToolTip(fileInfo.fileName());
+    }
 }
 
 FileMsgWidget::~FileMsgWidget()

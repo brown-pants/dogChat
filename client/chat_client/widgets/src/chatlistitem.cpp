@@ -3,7 +3,7 @@
 
 ChatListItem::ChatListItem(const QPixmap &profile, const QString &friendName, const QString &msg, const QString &time, QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::ChatListItem)
+    , ui(new Ui::ChatListItem), msgText(msg)
 {
     ui->setupUi(this);
     ui->profileLabel->setPixmap(profile);
@@ -25,4 +25,20 @@ void ChatListItem::hideRedCircle()
 void ChatListItem::showRedCircle()
 {
     ui->redCircleWidget->show();
+}
+
+void ChatListItem::resizeEvent(QResizeEvent *e)
+{
+    // 超出文本范围显示...
+    QFontMetrics metrics(ui->msgLabel->font());
+    QString elidedText = metrics.elidedText(msgText, Qt::ElideRight, ui->msgLabel->width());
+    ui->msgLabel->setText(elidedText);
+    if(elidedText != msgText)
+    {
+        ui->msgLabel->setToolTip(msgText);
+    }
+    else
+    {
+        ui->msgLabel->setToolTip("");
+    }
 }

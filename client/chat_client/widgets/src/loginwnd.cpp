@@ -5,6 +5,8 @@
 #include <QPainterPath>
 #include <QMovie>
 #include <QPaintEvent>
+#include <QAbstractItemView>
+#include <QListView>
 
 LoginWnd::LoginWnd(QWidget *parent)
     : QWidget(parent)
@@ -43,6 +45,8 @@ LoginWnd::LoginWnd(QWidget *parent)
 
     // 设置固定尺寸
     setFixedSize(500, 400);
+    ui->shadowWidget->setFixedHeight(height() - 2 * shadowWidth);
+    setFixedHeight(600); // 避免旋转时左右下角被遮挡
     ui->topWidget->setFixedHeight(130);
 
     // 设置控制栏
@@ -84,8 +88,45 @@ LoginWnd::LoginWnd(QWidget *parent)
     // 设置事件过滤器(渲染翻转效果)
     installEventFilter(this);
 
+    // 设置账号下拉框
+    ui->accountComboBox->view()->setMaximumHeight(100);
+
+    // 设置事件过滤器(下拉列表位置调整)
+    ui->accountComboBox->view()->installEventFilter(this);
+
     // 显示登录页
     ui->stackedWidget->setCurrentWidget(ui->loginPage);
+
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+    ui->accountComboBox->addItem("小鸡毛0");
+
+
 }
 
 LoginWnd::~LoginWnd()
@@ -189,13 +230,17 @@ bool LoginWnd::eventFilter(QObject *obj, QEvent *event)
             painter.drawPixmap(-width() / 2 + shadowWidth, shadowWidth, pixmap);
         }
     }
+    else if (obj == ui->accountComboBox->view() && event->type() == QEvent::Paint)
+    {
+        ui->accountComboBox->view()->move(0, 2);
+    }
     return QWidget::eventFilter(obj, event);
 }
 
 void LoginWnd::onFocusChanged(QWidget *old, QWidget *now)
 {
     static QVector<QWidget *> lineEdits = {
-        ui->accountEdit, ui->passwordEdit, ui->userEdit, ui->pwdEdit, ui->rePwdEdit, ui->serverIpEdit, ui->serverPortEdit
+        ui->accountComboBox, ui->passwordEdit, ui->userEdit, ui->pwdEdit, ui->rePwdEdit, ui->serverIpEdit, ui->serverPortEdit
     };
     static QVector<QWidget *> widgets = {
         ui->accountWidget, ui->passwordWidget, ui->userWidget, ui->pwdWidget, ui->rePwdWidget, ui->serverIpWidget, ui->serverPortWidget

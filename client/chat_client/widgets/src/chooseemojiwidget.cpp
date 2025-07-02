@@ -14,8 +14,6 @@ ChooseEmojiWidget::ChooseEmojiWidget(QWidget *parent)
 {
     ui->setupUi(this);
 
-    setStyleSheet("border: none");
-
     // 窗口无控制栏 点击其他窗口时关闭 且 透明
     setWindowFlags(Qt::FramelessWindowHint | Qt::Popup | Qt::NoDropShadowWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);

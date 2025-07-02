@@ -30,6 +30,7 @@ FriendListWidget::FriendListWidget(QWidget *parent)
     friends.insert(FriendInfo("", "miya", QPixmap("D:\\code\\MyChat\\xjm.gif")));
     friends.insert(FriendInfo("", "yucheng", QPixmap("D:\\code\\MyChat\\xjm.gif")));
     friends.insert(FriendInfo("", "A", QPixmap("D:\\code\\MyChat\\xjm.gif")));
+    friends.insert(FriendInfo("", "sdasdsadasdsadasd23423", QPixmap("D:\\code\\MyChat\\xjm.gif")));
     loadFriends(friends);
 }
 

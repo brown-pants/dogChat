@@ -207,6 +207,11 @@ QScrollBar::sub-line:vertical{
 }
 
 /*  表情选择窗口  */
+#ChooseEmojiWidget QTableView
+{
+    border: none;
+}
+
 #ChooseEmojiWidget #shadowWidget
 {
     background-color: rgb(255, 255, 255);
@@ -271,13 +276,14 @@ ControlWidget #closeButton:pressed
     border-bottom: none;
 }
 
-#LoginWnd ControlWidget #backgroundWidget
+#LoginWnd ControlWidget #minimizeButton
 {
-    border-top-right-radius: 5px;
+    border-radius: 0px;
 }
 
-#LoginWnd ControlWidget #closeButton:hover
+#LoginWnd ControlWidget #closeButton
 {
+    border-radius: 0px;
     border-top-right-radius: 5px;
 }
 
@@ -362,10 +368,41 @@ LoginWnd #titleLabel
     color: rgb(255, 255, 255);
 }
 
-LoginWnd QLineEdit,
-LoginWnd QLabel
+LoginWnd QLineEdit
 {
     border: none;
+    background-color: transparent;
+    padding-left: 8px;
+}
+
+LoginWnd QComboBox
+{
+    border: none;
+    background-color: transparent;
+}
+
+LoginWnd QComboBox::down-arrow
+{
+    image: url(:/res/img/ChevronDown.png);
+}
+
+LoginWnd QComboBox QAbstractItemView
+{
+    border: 1px solid rgb(180, 180, 180);
+    background-color: rgb(255, 255, 255);
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+LoginWnd QComboBox QAbstractItemView::item
+{
+    color: rgb(0, 0, 0);
+    background-color: transparent;
+}
+
+LoginWnd QComboBox QAbstractItemView::item:hover
+{
+    background-color: rgb(205, 207, 210);
 }
 
 LoginWnd QPushButton

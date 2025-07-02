@@ -31,5 +31,6 @@
         <file>res/img/Lock.png</file>
         <file>res/img/LockOpen.png</file>
         <file>res/img/Settings.png</file>
+        <file>res/img/ChevronDown.png</file>
     </qresource>
 </RCC>
