@@ -2,6 +2,7 @@
  *      存储管理类
  *  存储结构:
  *  root_dir/
+ *      config.json
  *      Users/
  *          user_id/
  *              profile.jpg
@@ -17,6 +18,7 @@
 #include <QObject>
 #include <QPixmap>
 #include <QMap>
+#include <QJsonObject>
 
 class StorageManager : public QObject
 {
@@ -27,12 +29,17 @@ public:
     QVector<QString> users() const;
     QPixmap *profile(const QString user) const;
 
+    QString serverIp() const;
+    QString serverPort() const;
+
 private:
     explicit StorageManager(QObject *parent = nullptr);
     ~StorageManager();
+    void saveConfig();
 
     QString root_dir;
     QMap<QString, QPixmap *> profileMap;
+    QJsonObject configJson;
 };
 
 #endif // STORAGEMANAGER_H
