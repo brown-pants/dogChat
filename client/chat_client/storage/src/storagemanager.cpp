@@ -79,7 +79,6 @@ StorageManager::StorageManager(QObject *parent)
             if (fileInfo.baseName() == "profile")
             {
                 QString profile_path = fileInfo.absoluteFilePath();
-                qDebug() << profile_path << Qt::endl;
                 profileMap.insert(user_id, new QPixmap(profile_path));
             }
         }
