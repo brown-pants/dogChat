@@ -26,6 +26,17 @@ QPixmap *StorageManager::profile(const QString user) const
     return iter.value();
 }
 
+void StorageManager::addUser(const QString &user, const QByteArray &profile)
+{
+    QDir dir = root_dir + "Users/" + user;
+    QString url = root_dir + "Users/" + user + "/profile";
+    if (!dir.exists())
+    {
+        dir.mkpath(".");
+    }
+    Util::WriteToFile(url, profile);
+}
+
 QString StorageManager::serverIp() const
 {
     return configJson["server"].toObject()["ip"].toString();
@@ -34,6 +45,20 @@ QString StorageManager::serverIp() const
 QString StorageManager::serverPort() const
 {
     return configJson["server"].toObject()["port"].toString();
+}
+
+void StorageManager::setServerIp(const QString &ip)
+{
+    QJsonObject serverObj = configJson["server"].toObject();
+    serverObj["ip"] = ip;
+    configJson["server"] = serverObj;
+}
+
+void StorageManager::setServerPort(const QString &port)
+{
+    QJsonObject serverObj = configJson["server"].toObject();
+    serverObj["port"] = port;
+    configJson["server"] = serverObj;
 }
 
 StorageManager::StorageManager(QObject *parent)
@@ -68,20 +93,9 @@ StorageManager::StorageManager(QObject *parent)
     while (it.hasNext())
     {
         QFileInfo dirInfo(it.next());
-        QString user_id = dirInfo.fileName();
+        QString user_name = dirInfo.fileName();
         QString user_path = dirInfo.filePath();
-
-        // 查找头像图片
-        QDirIterator it(user_path, QDir::Files);
-        while (it.hasNext())
-        {
-            QFileInfo fileInfo(it.next());
-            if (fileInfo.baseName() == "profile")
-            {
-                QString profile_path = fileInfo.absoluteFilePath();
-                profileMap.insert(user_id, new QPixmap(profile_path));
-            }
-        }
+        profileMap.insert(user_name, new QPixmap(user_path + "/profile"));
     }
 
     // 获取服务器ip和端口

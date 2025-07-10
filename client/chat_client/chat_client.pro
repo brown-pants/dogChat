@@ -14,12 +14,14 @@ INCLUDEPATH += \
     util/include/ \
     storage/include/ \
     widgets/include/ \
+    tcp/include/ \
     ../3rdparty/
 
 SOURCES += \
     main.cpp \
     appinit.cpp \
     storage/src/storagemanager.cpp \
+    tcp/src/tcpclient.cpp \
     util/src/util.cpp \
     widgets/src/loginwnd.cpp \
     widgets/src/friendlistitem.cpp \
@@ -36,6 +38,7 @@ SOURCES += \
 HEADERS += \
     appinit.h \
     storage/include/storagemanager.h \
+    tcp/include/tcpclient.h \
     util/include/util.h \
     widgets/include/loginwnd.h \
     widgets/include/friendlistitem.h \

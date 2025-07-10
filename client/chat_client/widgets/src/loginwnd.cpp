@@ -1,6 +1,9 @@
 #include "loginwnd.h"
 #include "ui_loginwnd.h"
 #include "storagemanager.h"
+#include "tcpclient.h"
+#include "util.h"
+#include "mainwnd.h"
 #include <QGraphicsDropShadowEffect>
 #include <QPainter>
 #include <QPainterPath>
@@ -9,10 +12,12 @@
 #include <QComboBox>
 #include <QAbstractItemView>
 #include <QFileDialog>
+#include <QMessageBox>
+#include <QTimer>
 
 LoginWnd::LoginWnd(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::LoginWnd), rotation(0), LockPixmap(":/res/img/Lock.png"), LockOpenPixmap(":/res/img/LockOpen.png")
+    , ui(new Ui::LoginWnd), rotation(0), LockPixmap(":/res/img/Lock.png"), LockOpenPixmap(":/res/img/LockOpen.png"), servConnSucc(false)
 {
     ui->setupUi(this);
 
@@ -86,14 +91,53 @@ LoginWnd::LoginWnd(QWidget *parent)
         ui->shadowWidget->setGraphicsEffect(shadow);
         ui->shadowWidget->show();
         // 设置头像按钮槽函数
-        if (ui->stackedWidget->currentWidget() == ui->loginPage)
+        if (ui->stackedWidget->currentWidget() != ui->registerPage)
         {
             disconnect(profileButton, &QPushButton::pressed, this, &LoginWnd::chooseProfile);
         }
-        else if (ui->stackedWidget->currentWidget() == ui->registerPage)
+        else
         {
             connect(profileButton, &QPushButton::pressed, this, &LoginWnd::chooseProfile);
         }
+    });
+
+    // slide动画
+    slideAnim = new QVariantAnimation(this);
+    connect(slideAnim, &QVariantAnimation::valueChanged, [this](const QVariant &value){
+        int height = value.toInt();
+        ui->topWidget->setFixedHeight(height);
+    });
+    connect(slideAnim, &QVariantAnimation::finished, [this](){
+        ui->stackedWidget->setEnabled(true);
+    });
+
+    loggingLabel = new QLabel(this);
+    loggingLabel->hide();
+    loggingTimer = new QTimer(this);
+    connect(loggingTimer, &QTimer::timeout, [this](){
+        int dotCount = loggingLabel->text().count('.');
+        if (dotCount == 3)
+        {
+            loggingLabel->setText("登录中.");
+        }
+        else loggingLabel->setText(loggingLabel->text() + '.');
+    });
+
+    rtnBtn = new QPushButton("返回", this);
+    rtnBtn->resize(100, 50);
+    rtnBtn->move(width() / 2 - rtnBtn->width() / 2, height() / 2 + 50);
+    rtnBtn->setStyleSheet("QPushButton {color: rgb(255, 255, 255);} "
+                          "QPushButton:hover {color: rgb(235, 235, 235);} "
+                          "QPushButton:pressed {color: rgb(215, 215, 215);} ");
+    rtnBtn->hide();
+    connect(rtnBtn, &QPushButton::clicked, [this](){
+        slideAnim->setDuration(500);
+        slideAnim->setStartValue(ui->topWidget->height());
+        slideAnim->setEndValue(130);
+        slideAnim->start();
+        loggingLabel->hide();
+        rtnBtn->hide();
+        ui->stackedWidget->setEnabled(false);
     });
 
     // 设置事件过滤器(渲染翻转效果)
@@ -120,6 +164,98 @@ LoginWnd::LoginWnd(QWidget *parent)
 
     // 设置事件过滤器(下拉列表位置调整)
     ui->accountComboBox->view()->installEventFilter(this);
+
+    // 设置页
+    ui->serverIpEdit->setText(StorageManager::GetInstance().serverIp());
+    ui->serverPortEdit->setText(StorageManager::GetInstance().serverPort());
+
+    // 保存按钮
+    connect(ui->settingButton, &QPushButton::clicked, [this](){
+        StorageManager::GetInstance().setServerIp(ui->serverIpEdit->text());
+        StorageManager::GetInstance().setServerPort(ui->serverPortEdit->text());
+        StorageManager::GetInstance().saveConfig();
+        // 重新连接TCP服务器
+        servConnSucc = false;
+        TcpClient::GetInstance().tcp_disconnect();
+        TcpClient::GetInstance().tcp_connect();
+        QMessageBox::information(this, "消息", "保存成功");
+    });
+
+    // 初始时直接连接TCP服务器
+    TcpClient::GetInstance().tcp_connect();
+
+    // 登陆注册槽函数
+    connect(ui->loginButton, &QPushButton::clicked, this, &LoginWnd::login);
+    connect(ui->registerButton, &QPushButton::clicked, this, &LoginWnd::regist);
+
+    connect(&TcpClient::GetInstance(), &TcpClient::connected, [this](){
+        servConnSucc = true;
+    });
+
+    // 注册完成
+    connect(&TcpClient::GetInstance(), &TcpClient::sig_regist_over, [this](const QString &status){
+        if (status == "success")
+        {
+            QMessageBox::information(this, "消息", "注册成功！");
+        }
+        else if (status == "fail")
+        {
+            QMessageBox::information(this, "消息", "用户名已存在，注册失败！");
+        }
+        else
+        {
+            QMessageBox::information(this, "消息", "服务器异常，注册失败！");
+        }
+    });
+
+    // 登录完成
+    connect(&TcpClient::GetInstance(), &TcpClient::sig_login_over, [this](const QString &status, const QString &profile){
+        if (status == "success")
+        {
+            loggingTimer->stop();
+            loggingLabel->move(width() / 2 - 35, height() / 2);
+            loggingLabel->setText("登录成功！");
+
+            QString user = ui->accountComboBox->currentText();
+
+            // 设置头像
+            QPixmap profilePixmap;
+            QByteArray profileData = QByteArray::fromBase64(profile.toUtf8());
+            profilePixmap.loadFromData(profileData);
+            profileButton->setIcon(QIcon(profilePixmap));
+            StorageManager::GetInstance().addUser(user, profileData);
+
+            // 重新设置定时器
+            disconnect(loggingTimer);
+            connect(loggingTimer, &QTimer::timeout, [this, user, profilePixmap](){
+                disconnect(qApp, &QApplication::focusChanged, this, &LoginWnd::onFocusChanged);
+                MainWnd::GetInstance(user, profilePixmap).show();
+                close();
+            });
+            loggingTimer->start(1000);
+        }
+        else if (status == "fail")
+        {
+            qDebug() << "login fail" << Qt::endl;
+            loggingTimer->stop();
+            loggingLabel->setText("用户名或密码错误！");
+            loggingLabel->setStyleSheet("color: red");
+            loggingLabel->resize(120, 30);
+            loggingLabel->move(width() / 2 - loggingLabel->width() / 2, height() / 2);
+            // 显示返回按钮
+            rtnBtn->show();
+        }
+        else
+        {
+            qDebug() << "login error" << Qt::endl;
+            loggingTimer->stop();
+            loggingLabel->move(width() / 2 - 40, height() / 2);
+            loggingLabel->setText("服务器异常！");
+            loggingLabel->setStyleSheet("color: red");
+            // 显示返回按钮
+            rtnBtn->show();
+        }
+    });
 
     // 显示登录页
     ui->stackedWidget->setCurrentWidget(ui->loginPage);
@@ -273,6 +409,12 @@ void LoginWnd::on_toRegisterButton_clicked()
     rotateAnim->setEndValue(180);
     rotateAnim->setDuration(800);
     rotateAnim->start();
+    // 恢复设置数据
+    if (ui->stackedWidget->currentWidget() == ui->settingPage)
+    {
+        ui->serverIpEdit->setText(StorageManager::GetInstance().serverIp());
+        ui->serverPortEdit->setText(StorageManager::GetInstance().serverPort());
+    }
 }
 
 void LoginWnd::on_toLoginButton_clicked()
@@ -284,6 +426,12 @@ void LoginWnd::on_toLoginButton_clicked()
     rotateAnim->setEndValue(0);
     rotateAnim->setDuration(800);
     rotateAnim->start();
+    // 恢复设置数据
+    if (ui->stackedWidget->currentWidget() == ui->settingPage)
+    {
+        ui->serverIpEdit->setText(StorageManager::GetInstance().serverIp());
+        ui->serverPortEdit->setText(StorageManager::GetInstance().serverPort());
+    }
 }
 
 void LoginWnd::on_toSettingButton_clicked()
@@ -299,9 +447,78 @@ void LoginWnd::on_toSettingButton_clicked()
 
 void LoginWnd::chooseProfile()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, "选择图像", "", "图像文件 (*.png *.jpg *.jpeg *.bmp *.gif)");
-    registerProfile.load(fileName);
+    profilePath = QFileDialog::getOpenFileName(this, "选择图像", "", "图像文件 (*.png *.jpg *.jpeg *.bmp *.gif)");
+    registerProfile.load(profilePath);
     profileButton->setIcon(QIcon(registerProfile));
+}
+
+void LoginWnd::login()
+{
+    if (!servConnSucc)
+    {
+        QMessageBox::critical(this, "错误", "服务器连接失败");
+        return;
+    }
+    if (ui->accountComboBox->currentText().isEmpty() || ui->passwordEdit->text().isEmpty())
+    {
+        QMessageBox::critical(this, "错误", "用户名或密码为空");
+        return;
+    }
+    TcpClient::GetInstance().Login(ui->accountComboBox->currentText(), ui->passwordEdit->text());
+    // 动画
+    ui->shadowVLayout->setEnabled(false);
+    ui->stackedWidget->setEnabled(false);
+    ui->stackedWidget->stackUnder(ui->topWidget);
+    slideAnim->setDuration(500);
+    slideAnim->setStartValue(ui->topWidget->height());
+    slideAnim->setEndValue(ui->shadowWidget->height());
+    slideAnim->start();
+    loggingLabel->setText("登录中...");
+    loggingTimer->start(800);
+    loggingLabel->setStyleSheet("color: rgb(255, 255, 255);");
+    loggingLabel->move(width() / 2 - 24, height() / 2);
+    loggingLabel->show();
+}
+
+void LoginWnd::regist()
+{
+    if (!servConnSucc)
+    {
+        QMessageBox::critical(this, "错误", "服务器连接失败");
+        return;
+    }
+    if (ui->pwdEdit->text() != ui->rePwdEdit->text())
+    {
+        QMessageBox::critical(this, "错误", "两次密码不同");
+        return;
+    }
+    if (registerProfile.isNull())
+    {
+        QMessageBox::critical(this, "错误", "请设置头像");
+        return;
+    }
+    QRegularExpression userRegExp("^[\\p{L}0-9]{1,20}$");
+    const QString &user = ui->userEdit->text();
+    if (!userRegExp.match(user).hasMatch())
+    {
+        QMessageBox::critical(this, "错误", "用户名由20以内非零个非特殊字符组成");
+        return;
+    }
+    QRegularExpression pwdRegExp("^[a-zA-Z0-9]{1,20}$");
+    const QString &pwd = ui->pwdEdit->text();
+    if (!pwdRegExp.match(pwd).hasMatch())
+    {
+        QMessageBox::critical(this, "错误", "密码由20以内非零个英文字符组成");
+        return;
+    }
+    QString profileData = Util::FileToBase64(profilePath);
+    if (profileData.size() > 2147483648)
+    {
+        QMessageBox::critical(this, "错误", "图片不得超过2G");
+        return;
+    }
+    // 注册
+    TcpClient::GetInstance().Regist(user, pwd, profileData);
 }
 
 

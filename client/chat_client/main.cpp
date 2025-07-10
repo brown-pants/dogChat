@@ -1,5 +1,4 @@
 #include "appinit.h"
-#include "mainwnd.h"
 #include "loginwnd.h"
 #include "storagemanager.h"
 
@@ -16,13 +15,8 @@ int main(int argc, char *argv[])
 
     StorageManager::GetInstance();
 
-    MainWnd mainwnd;
-    mainwnd.show();
-
-
-    LoginWnd login;
-    login.show();
-
+    LoginWnd loginwnd;
+    loginwnd.show();
 
     return a.exec();
 }

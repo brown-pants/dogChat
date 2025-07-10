@@ -6,8 +6,6 @@
  *      Users/
  *          user_id/
  *              profile.jpg
- *              msg/
- *                  friend_id.json
  *          *
  *  ------------------------------------
  */
@@ -26,16 +24,21 @@ class StorageManager : public QObject
 public:
     static StorageManager &GetInstance();
 
+    void saveConfig();
+
     QVector<QString> users() const;
     QPixmap *profile(const QString user) const;
+    void addUser(const QString &user, const QByteArray &profile);
 
     QString serverIp() const;
     QString serverPort() const;
 
+    void setServerIp(const QString &ip);
+    void setServerPort(const QString &port);
+
 private:
     explicit StorageManager(QObject *parent = nullptr);
     ~StorageManager();
-    void saveConfig();
 
     QString root_dir;
     QMap<QString, QPixmap *> profileMap;

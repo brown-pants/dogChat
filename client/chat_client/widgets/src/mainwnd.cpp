@@ -7,9 +7,9 @@
 #include <QGraphicsDropShadowEffect>
 #include <QMovie>
 
-MainWnd::MainWnd(QWidget *parent)
+MainWnd::MainWnd(const QString &user, const QPixmap &profile, QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::MainWnd)
+    , ui(new Ui::MainWnd), curr_user(user), user_profile(profile)
 {
     ui->setupUi(this);
 
@@ -62,13 +62,14 @@ MainWnd::MainWnd(QWidget *parent)
 
     // 初始状态
     ui->centerStackedWidget->setCurrentIndex(0);
-    ui->rightStackedWidget->setCurrentIndex(0);
+    ui->rightStackedWidget->setCurrentWidget(ui->homePage);
 
     // 左侧按钮
     ui->chatButton->setCheckable(true);
     ui->friendButtom->setCheckable(true);
     ui->chatButton->setChecked(true);
 
+    // 最大化时调整边距
     connect(ui->controlWidget, &ControlWidget::maximized, [this]() {
         layout()->setContentsMargins(0, 0, 0, 0);
         setProperty("shadowWidth", -5);
@@ -78,6 +79,14 @@ MainWnd::MainWnd(QWidget *parent)
         layout()->setContentsMargins(shadowWidth, shadowWidth, shadowWidth, shadowWidth);
         setProperty("shadowWidth", shadowWidth);
     });
+
+    ui->profileButton->setIcon(QIcon(user_profile));
+}
+
+MainWnd &MainWnd::GetInstance(const QString &user, const QPixmap &profile)
+{
+    static MainWnd instance(user, profile);
+    return instance;
 }
 
 MainWnd::~MainWnd()

@@ -7,6 +7,7 @@
 #define LOGINWND_H
 
 #include <QWidget>
+#include <QLabel>
 #include <QPushButton>
 #include <QPropertyAnimation>
 #include <QGraphicsDropShadowEffect>
@@ -35,12 +36,17 @@ private:
     Ui::LoginWnd *ui;
     QMovie *topMovie;
     QPushButton *profileButton;
+    QLabel *loggingLabel;
+    QTimer *loggingTimer;
+    QPushButton *rtnBtn;
     QPropertyAnimation *rotateAnim;
+    QVariantAnimation *slideAnim;
     int rotation;
     QPixmap LockPixmap;
     QPixmap LockOpenPixmap;
     QPixmap registerProfile;
-
+    QString profilePath;
+    bool servConnSucc;
 
 private slots:
     void onFocusChanged(QWidget *old, QWidget *now);
@@ -48,6 +54,8 @@ private slots:
     void on_toLoginButton_clicked();
     void on_toSettingButton_clicked();
     void chooseProfile();
+    void login();
+    void regist();
 };
 
 #endif // LOGINWND_H

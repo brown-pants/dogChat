@@ -2,6 +2,8 @@
 #include "pinyin4cpp/PinyinHelper.h"
 #include <QDebug>
 #include <QDir>
+#include <QBuffer>
+#include <QPixmap>
 
 char Util::GetInitial(const QString &str)
 {
@@ -67,6 +69,30 @@ QString Util::GetParentDirectory(const QString &path)
         qDebug() << "无法获取上级目录:" << path;
     }
     return "";
+}
+
+QString Util::FileToBase64(const QString &path)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        qWarning() << "无法打开文件:" << path;
+        return QString();
+    }
+
+    QByteArray imageData = file.readAll();
+    return QString::fromLatin1(imageData.toBase64().data());
+}
+
+bool Util::WriteToFile(const QString &path, const QByteArray &data)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        qWarning() << "无法打开文件:" << path;
+        return false;
+    }
+    return file.write(data);
 }
 
 void Util::JsonDocToObj(const QJsonDocument &jsonDoc, std::function<void (QJsonObject)> success, std::function<void ()> fail)

@@ -13,10 +13,10 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_5">
+  <layout class="QVBoxLayout" name="MainVLayout">
    <item>
     <widget class="QWidget" name="shadowWidget" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QVBoxLayout" name="shadowVLayout">
       <property name="spacing">
        <number>0</number>
       </property>
@@ -1180,7 +1180,7 @@
     </widget>
    </item>
    <item>
-    <spacer name="verticalSpacer_16">
+    <spacer name="bottomVSpacer">
      <property name="orientation">
       <enum>Qt::Orientation::Vertical</enum>
      </property>

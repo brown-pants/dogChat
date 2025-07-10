@@ -19,7 +19,7 @@ class MainWnd : public QWidget
     Q_OBJECT
 
 public:
-    MainWnd(QWidget *parent = nullptr);
+    static MainWnd &GetInstance(const QString &user = "", const QPixmap &profile = QPixmap());
     ~MainWnd();
 
 private slots:
@@ -29,5 +29,8 @@ private slots:
 
 private:
     Ui::MainWnd *ui;
+    QString curr_user;
+    QPixmap user_profile;
+    MainWnd(const QString &user, const QPixmap &profile, QWidget *parent = nullptr);
 };
 #endif // MAINWND_H
