@@ -1,8 +1,7 @@
 #include "appinit.h"
 #include "loginwnd.h"
 #include "mainwnd.h"
-#include "TcpClient.h"
-#include "storagemanager.h"
+#include "tcpclient.h"
 
 #include <QApplication>
 #include <QThread>
@@ -18,14 +17,13 @@ int main(int argc, char *argv[])
 
     TcpClient::GetInstance();
 
-    // 初始时直接连接TCP服务器
-    TcpClient::GetInstance().tcp_connect();
-
     MainWnd mainwnd;
     mainwnd.hide();
 
     LoginWnd loginwnd;
     loginwnd.show();
+
+    TcpClient::GetInstance().tcp_connect();
 
     qDebug() << "main thread: " << QThread::currentThread();
 

@@ -1,7 +1,7 @@
 #include "friendlistwidget.h"
 #include "ui_friendlistwidget.h"
 #include "friendlistitem.h"
-#include "TcpClient.h"
+#include "tcpclient.h"
 #include <QScrollBar>
 #include <QMessageBox>
 #include <QThread>

@@ -87,6 +87,7 @@ bool FindUserWidget::eventFilter(QObject *obj, QEvent *e)
         }
         pressed = false;
     }
+    return QWidget::eventFilter(obj, e);
 }
 
 void FindUserWidget::on_button_clicked()

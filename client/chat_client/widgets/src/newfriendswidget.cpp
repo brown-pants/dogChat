@@ -1,7 +1,7 @@
 #include "newfriendswidget.h"
 #include "ui_newfriendswidget.h"
 #include "newfriendsitem.h"
-#include "TcpClient.h"
+#include "tcpclient.h"
 
 NewFriendsWidget::NewFriendsWidget(QWidget *parent)
     : QWidget(parent)

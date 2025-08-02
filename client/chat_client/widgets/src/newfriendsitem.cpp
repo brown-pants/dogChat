@@ -1,6 +1,6 @@
 #include "newfriendsitem.h"
 #include "ui_newfriendsitem.h"
-#include "TcpClient.h"
+#include "tcpclient.h"
 #include <QMouseEvent>
 #include <QMenu>
 
