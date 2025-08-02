@@ -1,6 +1,7 @@
 #include "appinit.h"
 #include "loginwnd.h"
 #include "mainwnd.h"
+#include "storagemanager.h"
 #include "tcpclient.h"
 
 #include <QApplication>
@@ -15,6 +16,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     AppInit::Init();
 
+    StorageManager::GetInstance();
     TcpClient::GetInstance();
 
     MainWnd mainwnd;

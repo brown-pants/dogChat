@@ -12,7 +12,11 @@ TcpClient::TcpClient()
 
     QMetaObject::invokeMethod(this, "init", Qt::QueuedConnection);
 
+    // 等待初始化完成再向下执行
+    init_mutex.lock();
     _thread->start();
+    init_condition.wait(&init_mutex);
+    init_mutex.unlock();
 }
 
 TcpClient::~TcpClient()
@@ -259,6 +263,11 @@ void TcpClient::init()
     connect(this, &TcpClient::sig_removeFriend, this, &TcpClient::slo_removeFriend);
     connect(this, &TcpClient::sig_sendMsg, this, &TcpClient::slo_sendMsg);
     connect(this, &TcpClient::sig_loadWaitMsg, this, &TcpClient::slo_loadWaitMsg);
+
+    // 等待解锁
+    init_mutex.lock();
+    init_condition.wakeOne();
+    init_mutex.unlock();
 }
 
 TcpClient& TcpClient::GetInstance()

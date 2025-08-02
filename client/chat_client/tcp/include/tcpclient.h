@@ -3,6 +3,8 @@
 
 #include <QTcpSocket>
 #include <QThread>
+#include <QMutex>
+#include <QWaitCondition>
 #include "global.h"
 
 class TcpClient : public QObject
@@ -88,6 +90,9 @@ private:
     // 前 4Byte 为包头
     quint32 _message_len;   // 数据长度
     bool _b_recv_pending;
+
+    QMutex init_mutex;
+    QWaitCondition init_condition;
 
 signals:
 };
