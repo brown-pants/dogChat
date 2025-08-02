@@ -11,6 +11,9 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 #include <QAbstractTextDocumentLayout>
+#include <QPainter>
+#include <QPainterPath>
+#include <QMenu>
 
 QIcon ChatMsgItem::exclamationIcon;
 
@@ -46,6 +49,8 @@ ChatMsgItem::ChatMsgItem(bool myMsg, const QPixmap &profile, QListWidgetItem *li
 
     // 设置头像
     ui->profileLabel->setPixmap(profile);
+    // 隐藏感叹
+    ui->exclamationButton->hide();
 }
 
 ChatMsgItem::~ChatMsgItem()
@@ -109,7 +114,7 @@ void ChatMsgItem::setText(const QString &text)
         {
             textEdit->setFixedHeight(docHeight);
             ui->msgWidget->setFixedHeight(docHeight + ui->msgHLayout->contentsMargins().top() + ui->msgHLayout->contentsMargins().bottom());
-            listWidgetItem->setSizeHint(QSize(0, ui->msgWidget->height() + ui->mainHLayout->contentsMargins().top() + ui->mainHLayout->contentsMargins().bottom()));
+            listWidgetItem->setSizeHint(QSize(0, ui->msgWidget->height() + ui->mainHLayout->contentsMargins().top() + ui->mainHLayout->contentsMargins().bottom() + 2));
         }
         setProperty("lastDocHeight", docHeight);
     });
@@ -246,26 +251,58 @@ void ChatMsgItem::paintEvent(QPaintEvent *e)
 
 bool ChatMsgItem::eventFilter(QObject *obj, QEvent *event)
 {
-    if (event->type() == QEvent::Enter)
+    QMouseEvent *mouse_e = static_cast<QMouseEvent *>(event);
+    if (obj == ui->msgWidget && event->type() == QEvent::Enter)
     {
         // 鼠标进入
         hover = true;
         update();
     }
-    else if (event->type() == QEvent::Leave)
+    else if (obj == ui->msgWidget && event->type() == QEvent::Leave)
     {
         // 鼠标离开
         hover = false;
         update();
     }
-    else if (event->type() == QEvent::MouseButtonDblClick && static_cast<QMouseEvent *>(event)->button() == Qt::LeftButton)
+    else if (obj == ui->msgWidget && event->type() == QEvent::MouseButtonPress && mouse_e->button() == Qt::RightButton && property("fileUrl").toString().mid(0, 1) != ":")
     {
-        // 双击文件消息可打开文件
-        const QString &fileUrl = property("fileUrl").toString();
-        if(!QDesktopServices::openUrl(QUrl::fromLocalFile(fileUrl)))
+        QMenu menu;
+        QAction *openFile_action = menu.addAction("打开文件");
+        QAction *openDir_action = menu.addAction("打开文件所在目录");
+        QAction *action = menu.exec(mouse_e->globalPosition().toPoint());
+        if (action == openFile_action)
         {
-            QMessageBox::critical(this, "错误", "文件已删除");
+            openFile();
+        }
+        else if (action == openDir_action)
+        {
+            openDir();
         }
     }
+    else if (obj == ui->msgWidget && event->type() == QEvent::MouseButtonDblClick && mouse_e->button() == Qt::LeftButton && property("fileUrl").toString().mid(0, 1) != ":")
+    {
+        // 双击文件消息可打开文件
+        openFile();
+    }
     return QObject::eventFilter(obj, event);
+}
+
+void ChatMsgItem::openFile()
+{
+    const QString &fileUrl = property("fileUrl").toString();
+    if(!QDesktopServices::openUrl(QUrl::fromLocalFile(fileUrl)))
+    {
+        QMessageBox::critical(this, "错误", "文件已删除");
+    }
+}
+
+void ChatMsgItem::openDir()
+{
+    const QString &fileUrl = property("fileUrl").toString();
+    QFileInfo fileInfo(fileUrl);
+    QUrl folderUrl = QUrl::fromLocalFile(fileInfo.absolutePath());
+    if (!QDesktopServices::openUrl(folderUrl))
+    {
+        QMessageBox::critical(this, "错误", "文件夹不存在");
+    }
 }

@@ -7,8 +7,10 @@
 #define CHATWIDGET_H
 
 #include <QWidget>
+#include <QDateTime>
 
 #include "chooseemojiwidget.h"
+#include "global.h"
 
 namespace Ui {
 class ChatWidget;
@@ -21,6 +23,12 @@ class ChatWidget : public QWidget
 public:
     explicit ChatWidget(QWidget *parent = nullptr);
     ~ChatWidget();
+    void loadMessages(const QString &user);
+    QString curUser() const;
+    void appendMsg(ChatMsgInfo msg);
+
+signals:
+    void sendMsg(const QString &user, ChatMsgInfo msg);
 
 private slots:
     void on_sendButton_clicked();
@@ -34,9 +42,19 @@ private slots:
 private:
     Ui::ChatWidget *ui;
     ChooseEmojiWidget *chooseEmojiWidget;
+    QString m_curUser;
+    QDateTime lastMsgTime;
+    QDateTime _LastMsgTime;
+    int msgRow;
+    int sendMsgCnter = 0;
 
-    void addTextMsg(bool myMsg, const QPixmap &profile, const QString &text);
-    void addFileMsg(bool myMsg, const QPixmap &profile, const QString &url);
+    void addTextMsg(bool myMsg, const QPixmap &profile, const QString &text, int row = -1);
+    void addFileMsg(bool myMsg, const QPixmap &profile, const QString &url, int row = -1);
+    void addTime(const QString &time, int row = -1);
+    void addLoadOld(int row);
+    void loadMsg(const QString &user);
+    void clearMsg();
+    void sendFileMsg(const QString &url);
 };
 
 #endif // CHATWIDGET_H

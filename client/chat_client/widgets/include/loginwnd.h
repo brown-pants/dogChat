@@ -47,6 +47,7 @@ private:
     QPixmap registerProfile;
     QString profilePath;
     bool servConnSucc;
+    bool topRounded;
 
 private slots:
     void onFocusChanged(QWidget *old, QWidget *now);

@@ -91,6 +91,7 @@ QScrollBar::sub-line:vertical{
 #searchWidget
 {
     background-color: rgb(239, 240, 241);
+    border-right: 1px solid rgb(230, 231, 232);
 }
 
 #searchWidget QPushButton
@@ -136,10 +137,14 @@ QScrollBar::sub-line:vertical{
     border-right: none;
 }
 
-/*  右侧列表  */
-#rightStackedWidget QListWidget
+#titleWidget QLabel
 {
-    border-left: 1px solid rgb(230, 231, 232);
+    padding-left: 10px;
+}
+
+#centerStackedWidget QListWidget
+{
+    border-right: 1px solid rgb(230, 231, 232);
 }
 
 /*  主页  */
@@ -270,10 +275,6 @@ ControlWidget #closeButton:pressed
 {
     background: rgb(246, 246, 247);
     border-top-right-radius: 10px;
-    border: 1px solid rgb(230, 231, 232);
-    border-top: none;
-    border-right: none;
-    border-bottom: none;
 }
 
 #LoginWnd ControlWidget #minimizeButton
@@ -314,10 +315,136 @@ ControlWidget #closeButton:pressed
     background: rgb(218, 228, 240);
 }
 
+#FriendListWidget #cancelButton
+{
+    background: transparent;
+}
+
+/*  查找用户窗口  */
+#FindUserWidget #shadowWidget
+{
+    background-color: rgb(255, 255, 255);
+    border-radius: 5px;
+}
+
+#FindUserWidget #button
+{
+    color: rgb(255, 255, 255);
+    background-color: rgb(17, 203, 106);
+    border-radius: 5px;
+}
+
+#FindUserWidget #button:hover
+{
+    background-color: rgb(27, 213, 116);
+}
+
+#FindUserWidget #button:pressed
+{
+    background-color: rgb(7, 193, 96);
+}
+
 /*  聊天窗口    */
 #ChatWidget QListWidget
 {
     background: rgb(246, 246, 247);
+}
+
+/*  新的好友窗口  */
+#NewFriendsWidget #titleLabel
+{
+    background-color: rgb(246, 246, 247);
+    border-bottom: 1px solid rgb(230, 231, 232);
+    padding-left: 10px;
+}
+
+#NewFriendsWidget QListWidget
+{
+    background: rgb(246, 246, 247);
+    border-bottom-right-radius: 10px;
+}
+
+#NewFriendsWidget QListWidget::item
+{
+    border-bottom: 1px solid rgb(230, 231, 232);
+    margin-left: 100px;
+    margin-right: 100px;
+}
+
+#NewFriendsWidget #passButton
+{
+    color: rgb(255, 255, 255);
+    background-color: rgb(17, 203, 106);
+    border-radius: 5px;
+}
+
+#NewFriendsWidget #passButton:hover
+{
+    background-color: rgb(27, 213, 116);
+}
+
+#NewFriendsWidget #passButton:pressed
+{
+    background-color: rgb(7, 193, 96);
+}
+
+#NewFriendsWidget #refuseButton
+{
+    border: none;
+    border-radius: 5px;
+    background-color: rgb(225, 227, 230);
+}
+
+#NewFriendsWidget #refuseButton:hover
+{
+    background-color: rgb(205, 207, 210);
+}
+
+#NewFriendsWidget #refuseButton:pressed
+{
+    background-color: rgb(195, 197, 190);
+}
+
+#NewFriendsItem #leaveLabel,
+#NewFriendsItem #addedLabel
+{
+    color: gray;
+}
+
+/*  好友信息窗口  */
+#FriendInfoWidget #mainWidget
+{
+    background: rgb(246, 246, 247);
+    border-bottom-right-radius: 10px;
+}
+
+#FriendInfoWidget QPushButton
+{
+    border: none;
+    border-radius: 8px;
+}
+
+#FriendInfoWidget QPushButton:hover
+{
+    background-color: rgb(205, 207, 210);
+}
+
+#FriendInfoWidget QPushButton:pressed
+{
+    background-color: rgb(195, 197, 190);
+}
+
+#FriendInfoWidget #areaLabel,
+#FriendInfoWidget #signLabel,
+#FriendInfoWidget #sourceLabel
+{
+    color: gray;
+}
+
+#FriendInfoWidget #topWidget,
+#FriendInfoWidget #centerWidget
+{
+    border-bottom: 1px solid rgb(230, 231, 232);
 }
 
 /*  左侧窗口    */
@@ -465,4 +592,51 @@ LoginWnd #serverPortWidget
 {
     border: none;
     border-bottom: 1px solid rgb(180, 180, 180);
+}
+
+ApplyFriendDialog #shadowWidget
+{
+    background: rgb(246, 246, 247);
+    border-radius: 5px;
+}
+
+ApplyFriendDialog QTextEdit
+{
+    border: none;
+    border-radius: 5px;
+    background-color: rgb(255, 255, 255);
+}
+
+ApplyFriendDialog #applyButton
+{
+    color: rgb(255, 255, 255);
+    background-color: rgb(17, 203, 106);
+    border-radius: 5px;
+}
+
+ApplyFriendDialog #applyButton:hover
+{
+    background-color: rgb(27, 213, 116);
+}
+
+ApplyFriendDialog #applyButton:pressed
+{
+    background-color: rgb(7, 193, 96);
+}
+
+ApplyFriendDialog #cancelButton
+{
+    border: none;
+    border-radius: 5px;
+    background-color: rgb(225, 227, 230);
+}
+
+ApplyFriendDialog #cancelButton:hover
+{
+    background-color: rgb(205, 207, 210);
+}
+
+ApplyFriendDialog #cancelButton:pressed
+{
+    background-color: rgb(195, 197, 190);
 }

@@ -46,8 +46,9 @@ bool AppInit::eventFilter(QObject *obj, QEvent *event)
     bool canMove = w->property("canMove").toBool();
     bool canResize = w->property("canResize").toBool();
 
-    // 鼠标移动到列表时，改变光标为默认箭头
-    if (event->type() == QEvent::MouseMove && (obj->inherits("ChatListItem") || obj->inherits("QListWidget")))
+    // 鼠标移动到列表或按钮时，改变光标为默认箭头
+    if (event->type() == QEvent::MouseMove &&
+        (obj->objectName() == "qt_scrollarea_viewport" || obj->inherits("QScrollBar") || obj->inherits("QListWidget") || obj->inherits("QPushButton")))
     {
         w->setCursor(Qt::ArrowCursor);
     }

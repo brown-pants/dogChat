@@ -17,6 +17,8 @@ public:
     void dealMsgs();
     void stop();
 
+    void Offline(std::shared_ptr<Session> session);
+
 private:
     LogicSystem();
     std::queue<std::function<void()>> m_msgs;
@@ -27,6 +29,18 @@ private:
     std::string toTcpData(const std::string body);
     void Login(const std::string &user, const std::string &pwd, std::shared_ptr<Session> session);
     void Regist(const std::string &user, const std::string &pwd, std::vector<u_char> profile, std::shared_ptr<Session> session);
+    void FindUser(const std::string &user, std::shared_ptr<Session> session);
+    void ApplyFriend(const std::string &user, const std::string &leave, std::shared_ptr<Session> session);
+    void ApplyFriendRequest(const std::string &apply_user, const std::string &leave, std::shared_ptr<Session> session);
+    void RecvApplyFriendRequest(const std::string &user, std::shared_ptr<Session> session);
+    void RecvFriends(const std::string &user, std::shared_ptr<Session> session);
+    void PassFriendApply(const std::string &user, std::shared_ptr<Session> session);
+    void RefuseFriendApply(const std::string &user, std::shared_ptr<Session> session);
+    void ChangeProfile(std::vector<u_char> profile, std::shared_ptr<Session> session);
+    void RemoveFriendApply(const std::string &user, std::shared_ptr<Session> session);
+    void RemoveFriend(const std::string &user, std::shared_ptr<Session> session);
+    void SendMsg(const std::string &msgId, const std::string &user, const std::string &time, const std::string &msg, bool file_msg, std::shared_ptr<Session> session);
+    void LoadWaitMsg(std::shared_ptr<Session> session);
 };
 
 #endif

@@ -23,12 +23,15 @@ public:
     void hideRedCircle();
     void showRedCircle();
 
+    QString getUser() const;
+
 protected:
     void resizeEvent(QResizeEvent *e);
 
 private:
     Ui::ChatListItem *ui;
     QString msgText;
+    QString user;
 };
 
 #endif // CHATLISTITEM_H

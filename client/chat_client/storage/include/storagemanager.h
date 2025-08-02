@@ -17,10 +17,11 @@
 #include <QPixmap>
 #include <QMap>
 #include <QJsonObject>
+#include <QJsonArray>
+#include "global.h"
 
-class StorageManager : public QObject
+class StorageManager
 {
-    Q_OBJECT
 public:
     static StorageManager &GetInstance();
 
@@ -36,13 +37,30 @@ public:
     void setServerIp(const QString &ip);
     void setServerPort(const QString &port);
 
+    void insertToChatList(const QString &user, int row);
+    void removeFromChatList(int row);
+    QVector<QString> chatList() const;
+    void loadChatList(const QString &user);
+    void saveChatList(const QString &user);
+
+    void loadChatMsg(const QString &cur_user, const QString &userB);
+    ChatMsgInfo getChatMsg(const QString &user, int row);
+    void addChatMsg(const QString &user, ChatMsgInfo info);
+    int chatMsgCount(const QString &user);
+    void saveChatMsg(const QString &curUser, const QString &user);
+
+    QString saveFile(const QString &userA, const QString &userB, const QString &fileName, const QByteArray &data);
+
 private:
-    explicit StorageManager(QObject *parent = nullptr);
+    explicit StorageManager();
     ~StorageManager();
 
     QString root_dir;
     QMap<QString, QPixmap *> profileMap;
     QJsonObject configJson;
+    QJsonArray chatListJson;
+
+    QMap<QString, QJsonArray> chatMsg;
 };
 
 #endif // STORAGEMANAGER_H

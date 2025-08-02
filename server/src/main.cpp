@@ -2,6 +2,7 @@
 #include "tcp/Server.h"
 #include "tcp/LogicSystem.h"
 #include "pool/IOContextPool.h"
+#include "dao/MySQLDao.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,6 +12,7 @@ int main(int argc, char *argv[])
     {
         IOContextPool &pool = IOContextPool::GetInstance();
         LogicSystem &logic_sys = LogicSystem::GetInstance();
+        MysqlDao &dao = MysqlDao::GetInstance();
         
         boost::asio::io_context  io_context;
         Server server(io_context, std::stoi(Config::server_port()));

@@ -32,5 +32,11 @@
         <file>res/img/LockOpen.png</file>
         <file>res/img/Settings.png</file>
         <file>res/img/ChevronDown.png</file>
+        <file>res/img/friend.jpeg</file>
+        <file>res/img/find.png</file>
+        <file>res/img/Comment_black.png</file>
+        <file>res/img/MenuMeatball.png</file>
+        <file>res/img/Comment_blue.png</file>
+        <file>res/icon/anim7.ico</file>
     </qresource>
 </RCC>

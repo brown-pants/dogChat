@@ -45,6 +45,9 @@ private:
     Type msgType;   // 消息类型
     QColor bubbleColor;
     QListWidgetItem *listWidgetItem;
+
+    void openFile();
+    void openDir();
 };
 
 #endif // CHATMSGITEM_H

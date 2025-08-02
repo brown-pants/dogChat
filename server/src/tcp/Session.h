@@ -13,6 +13,8 @@ public:
     void close();
     boost::asio::ip::tcp::socket &getSocket() { return m_socket; }
     void write(const std::string &msg);
+    void setUser(const std::string &user);
+    std::string curUser() const;
 
 private:
     Message m_msg;
@@ -22,6 +24,8 @@ private:
     void do_write();
     std::queue<std::string> sendQueue;
     std::mutex mtx;
+    std::string user;
+    bool is_writing;
 };
 
 #endif

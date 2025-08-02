@@ -80,8 +80,20 @@ QString Util::FileToBase64(const QString &path)
         return QString();
     }
 
-    QByteArray imageData = file.readAll();
-    return QString::fromLatin1(imageData.toBase64().data());
+    QByteArray fileData = file.readAll();
+    return QString::fromLatin1(fileData.toBase64().data());
+}
+
+QByteArray Util::FileToByteArray(const QString &path)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        qWarning() << "无法打开文件:" << path;
+        return QByteArray();
+    }
+
+    return file.readAll();
 }
 
 bool Util::WriteToFile(const QString &path, const QByteArray &data)
@@ -104,6 +116,15 @@ void Util::JsonDocToObj(const QJsonDocument &jsonDoc, std::function<void (QJsonO
     else fail();
 }
 
+void Util::JsonDocToArray(const QJsonDocument &jsonDoc, std::function<void (QJsonArray)> success, std::function<void ()> fail)
+{
+    if (jsonDoc.isArray())
+    {
+        success(jsonDoc.array());
+    }
+    else fail();
+}
+
 void Util::JsonValueToObj(const QJsonValue &jsonValue, std::function<void (QJsonObject)> success, std::function<void ()> fail)
 {
     if (jsonValue.isObject())
@@ -118,6 +139,15 @@ void Util::JsonValueToString(const QJsonValue &jsonValue, std::function<void (QS
     if (jsonValue.isString())
     {
         success(jsonValue.toString());
+    }
+    else fail();
+}
+
+void Util::JsonValueToArray(const QJsonValue &jsonValue, std::function<void (QJsonArray)> success, std::function<void ()> fail)
+{
+    if (jsonValue.isArray())
+    {
+        success(jsonValue.toArray());
     }
     else fail();
 }

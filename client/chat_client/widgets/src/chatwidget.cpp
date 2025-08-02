@@ -1,10 +1,13 @@
 #include "chatwidget.h"
 #include "ui_chatwidget.h"
 #include "chatmsgitem.h"
+#include "storagemanager.h"
+#include "mainwnd.h"
+#include "tcpclient.h"
 
 #include <QScrollBar>
-#include <QPixmap>
 #include <QFileDialog>
+#include <QtConcurrent/QtConcurrent>
 
 ChatWidget::ChatWidget(QWidget *parent)
     : QWidget(parent)
@@ -45,40 +48,250 @@ ChatWidget::ChatWidget(QWidget *parent)
     connect(chooseEmojiWidget, &ChooseEmojiWidget::charEmojiClicked, [this](const QString &emoji){
         ui->msgTextEdit->insertPlainText(emoji);
     });
+    // 发表情
     connect(chooseEmojiWidget, &ChooseEmojiWidget::animEmojiClicked, [this](const QString &url){
-        addFileMsg(true, QPixmap("D:\\code\\MyChat\\xjm.gif"), url);
-        ui->chatMsgListWidget->scrollToBottom();
+        sendFileMsg(url);
     });
 
-
-    //-----------------------------
-
-    addTextMsg(false, QPixmap("D:\\code\\MyChat\\xjm.gif"), "你好呀\n我是小鸡毛1111n我是小鸡毛1111n我是小鸡毛1111n我是小鸡毛1111n我是小鸡毛1111n我是小鸡毛1111n我是小鸡毛1111n我是小鸡毛1111n我是小鸡毛1111n我是小鸡毛1111");
-
-    //-----------------------------
+    connect(ui->chatMsgListWidget, &QListWidget::itemClicked, this, [this](QListWidgetItem *item){
+        if (item->text() == "查看更多消息")
+        {
+            QListWidgetItem *top = ui->chatMsgListWidget->item(0);
+            loadMsg(m_curUser);
+            ui->chatMsgListWidget->scrollToItem(top, QAbstractItemView::PositionAtTop);
+            ui->chatMsgListWidget->takeItem(ui->chatMsgListWidget->row(item));
+        }
+    });
 }
 
 ChatWidget::~ChatWidget()
 {
     delete ui;
+    while (ui->chatMsgListWidget->count())
+    {
+        QListWidgetItem *item = ui->chatMsgListWidget->takeItem(0);
+        delete ui->chatMsgListWidget->itemWidget(item);
+        delete item;
+    }
 }
 
-void ChatWidget::addTextMsg(bool myMsg, const QPixmap &profile, const QString &text)
+void ChatWidget::loadMsg(const QString &user)
 {
-    QListWidgetItem *item = new QListWidgetItem(ui->chatMsgListWidget);
+    lastMsgTime = QDateTime();
+    int cnt = StorageManager::GetInstance().chatMsgCount(user);
+    int row = msgRow + 10;
+    int oldRow = msgRow;
+
+    if (row > cnt)
+    {
+        row = cnt;
+    }
+
+    int counter = 0;
+
+    for (row = row - 1; row >= oldRow; row --)
+    {
+        msgRow ++;
+        ChatMsgInfo msg = StorageManager::GetInstance().getChatMsg(user, row);
+        QDateTime curTime = QDateTime::fromString(msg.time, "yyyy/MM/dd HH:mm");
+
+        if (lastMsgTime.isNull() || lastMsgTime.secsTo(curTime) >= 300)
+        {
+            // 是否为今天
+            if (curTime.date() == QDate::currentDate())
+            {
+                addTime(msg.time.split(" ")[1], counter ++);
+            }
+            else
+            {
+                addTime(msg.time, counter ++);
+            }
+        }
+        lastMsgTime = curTime;
+
+        // 获取头像
+        const QPixmap &profile = msg.self ? MainWnd::GetInstance()->curUserProfile() : MainWnd::GetInstance()->getUserProfile(msg.user);
+
+        if (msg.type == "text")
+        {
+            addTextMsg(msg.self, profile, msg.msg, counter ++);
+        }
+        else
+        {
+            addFileMsg(msg.self, profile, msg.msg, counter ++);
+        }
+    }
+    if (msgRow < cnt)
+    {
+        addLoadOld(0);
+    }
+}
+
+void ChatWidget::clearMsg()
+{
+    while (ui->chatMsgListWidget->count() != 0)
+    {
+        QListWidgetItem *item = ui->chatMsgListWidget->takeItem(0);
+        delete ui->chatMsgListWidget->itemWidget(item);
+        delete item;
+    }
+}
+
+void ChatWidget::sendFileMsg(const QString &url)
+{
+    const QString &time = QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm");
+
+    if (url.mid(0, 1) == ":")
+    {// 内置表情
+        ChatMsgInfo msgInfo(time, "file", url, MainWnd::GetInstance()->curUser(), true);
+
+        appendMsg(msgInfo);
+        emit sendMsg(curUser(), msgInfo);
+
+        if (m_curUser != MainWnd::GetInstance()->curUser())
+        {// 发送至服务器
+            TcpClient::GetInstance().SendMsg(QString::number(++ sendMsgCnter), m_curUser, time, url, true);
+        }
+    }
+    else
+    {// 创建存储文件
+        QString fileName = QFileInfo(url).fileName().remove(QRegularExpression("\\s+")); // 去除文件名空格
+        // 保存文件并获取路径
+        QString newUrl = StorageManager::GetInstance().saveFile(MainWnd::GetInstance()->curUser(), m_curUser, fileName, Util::FileToByteArray(url));
+
+        ChatMsgInfo msgInfo(time, "file", newUrl, MainWnd::GetInstance()->curUser(), true);
+        appendMsg(msgInfo);
+        emit sendMsg(curUser(), msgInfo);   // 传输文件名和Base64数据 如 sad.png ABC
+
+        // FileToBase64很慢 多线程防止阻塞窗口渲染
+        QFutureWatcher<QString> *watcher = new QFutureWatcher<QString>(this);
+        connect(watcher, &QFutureWatcher<QString>::finished, this, [watcher, time, this]() {
+            QString send_msg = watcher->result();
+            if (m_curUser != MainWnd::GetInstance()->curUser())
+            {// 发送至服务器
+                TcpClient::GetInstance().SendMsg(QString::number(++ sendMsgCnter), m_curUser, time, send_msg, true);
+            }
+            watcher->deleteLater();
+        });
+        QFuture<QString> future = QtConcurrent::run([=]() {
+            QString send_msg = fileName + " " + Util::FileToBase64(url);
+            return send_msg;
+        });
+        watcher->setFuture(future);
+    }
+}
+
+void ChatWidget::loadMessages(const QString &user)
+{
+    clearMsg();
+    ui->userLabel->setText(user);
+    m_curUser = user;
+
+    msgRow = 0;
+    loadMsg(user);
+    _LastMsgTime = lastMsgTime;
+    ui->chatMsgListWidget->scrollToBottom();
+}
+
+QString ChatWidget::curUser() const
+{
+    return m_curUser;
+}
+
+void ChatWidget::appendMsg(ChatMsgInfo msg)
+{
+    QDateTime curTime = QDateTime::fromString(msg.time, "yyyy/MM/dd HH:mm");
+
+    if (_LastMsgTime.isNull() || _LastMsgTime.secsTo(curTime) >= 300)
+    {
+        // 是否为今天
+        if (curTime.date() == QDate::currentDate())
+        {
+            addTime(msg.time.split(" ")[1]);
+        }
+        else
+        {
+            addTime(msg.time);
+        }
+    }
+    _LastMsgTime = curTime;
+
+    // 获取头像
+    const QPixmap &profile = msg.self ? MainWnd::GetInstance()->curUserProfile() : MainWnd::GetInstance()->getUserProfile(msg.user);
+
+    if (msg.type == "text")
+    {
+        addTextMsg(msg.self, profile, msg.msg);
+    }
+    else
+    {
+        addFileMsg(msg.self, profile, msg.msg);
+    }
+
+    ui->chatMsgListWidget->scrollToBottom();
+}
+
+void ChatWidget::addTextMsg(bool myMsg, const QPixmap &profile, const QString &text, int row)
+{
+    QListWidgetItem *item = new QListWidgetItem();
+
     ChatMsgItem *pItemWidget = new ChatMsgItem(myMsg, profile, item, ui->chatMsgListWidget);
     pItemWidget->setText(text);
-    ui->chatMsgListWidget->addItem(item);
+
+    if (row < 0)
+    {
+        ui->chatMsgListWidget->addItem(item);
+    }
+    else
+    {
+        ui->chatMsgListWidget->insertItem(row, item);
+    }
     ui->chatMsgListWidget->setItemWidget(item, pItemWidget);
 }
 
-void ChatWidget::addFileMsg(bool myMsg, const QPixmap &profile, const QString &url)
+void ChatWidget::addFileMsg(bool myMsg, const QPixmap &profile, const QString &url, int row)
 {
-    QListWidgetItem *item = new QListWidgetItem(ui->chatMsgListWidget);
+    QListWidgetItem *item = new QListWidgetItem();
+
     ChatMsgItem *pItemWidget = new ChatMsgItem(myMsg, profile, item, ui->chatMsgListWidget);
     pItemWidget->setFile(url);
-    ui->chatMsgListWidget->addItem(item);
+
+    if (row < 0)
+    {
+        ui->chatMsgListWidget->addItem(item);
+    }
+    else
+    {
+        ui->chatMsgListWidget->insertItem(row, item);
+    }
     ui->chatMsgListWidget->setItemWidget(item, pItemWidget);
+}
+
+void ChatWidget::addTime(const QString &time, int row)
+{
+    QListWidgetItem* item = nullptr;
+    if (row < 0)
+    {
+        ui->chatMsgListWidget->addItem(time);
+        item = ui->chatMsgListWidget->item(ui->chatMsgListWidget->count() - 1);
+    }
+    else
+    {
+        ui->chatMsgListWidget->insertItem(row, time);
+        item = ui->chatMsgListWidget->item(row);
+    }
+    item->setTextAlignment(Qt::AlignCenter);
+    item->setFlags(item->flags() & ~Qt::ItemIsSelectable & ~Qt::ItemIsEnabled);
+    item->setForeground(QBrush(Qt::gray));
+}
+
+void ChatWidget::addLoadOld(int row)
+{
+    QListWidgetItem* item = nullptr;
+    ui->chatMsgListWidget->insertItem(row, "查看更多消息");
+    item = ui->chatMsgListWidget->item(row);
+    item->setTextAlignment(Qt::AlignCenter);
+    item->setForeground(QBrush(QColor(50, 120, 180)));
 }
 
 void ChatWidget::on_sendButton_clicked()
@@ -86,9 +299,17 @@ void ChatWidget::on_sendButton_clicked()
     const QString &text = ui->msgTextEdit->document()->toPlainText();
     if (text != "")
     {
-        addTextMsg(true, QPixmap("D:\\code\\MyChat\\xjm.gif"), ui->msgTextEdit->document()->toPlainText());
-        ui->chatMsgListWidget->scrollToBottom();
+        const QString &time = QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm");
+        ChatMsgInfo msgInfo(time, "text", text, MainWnd::GetInstance()->curUser(), true);
+        appendMsg(msgInfo);
         ui->msgTextEdit->clear();
+
+        if (m_curUser != MainWnd::GetInstance()->curUser())
+        {// 发送至服务器
+            TcpClient::GetInstance().SendMsg(QString::number(++ sendMsgCnter), m_curUser, time, text, false);
+        }
+
+        emit sendMsg(curUser(), msgInfo);
     }
 }
 
@@ -105,8 +326,7 @@ void ChatWidget::on_imgButton_clicked()
     QString fileName = QFileDialog::getOpenFileName(this, "选择图像", "", "图像文件 (*.png *.jpg *.jpeg *.bmp *.gif)");
     if (fileName != "")
     {
-        addFileMsg(true, QPixmap("D:\\code\\MyChat\\xjm.gif"), fileName);
-        ui->chatMsgListWidget->scrollToBottom();
+        sendFileMsg(fileName);
     }
 }
 
@@ -115,8 +335,7 @@ void ChatWidget::on_fileButton_clicked()
     QString fileName = QFileDialog::getOpenFileName(this, "选择文件", "");
     if (fileName != "")
     {
-        addFileMsg(true, QPixmap("D:\\code\\MyChat\\xjm.gif"), fileName);
-        ui->chatMsgListWidget->scrollToBottom();
+        sendFileMsg(fileName);
     }
 }
 

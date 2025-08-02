@@ -4,6 +4,8 @@ TEMPLATE = app
 
 TARGET = chat_client
 
+RC_ICONS = res/icon/anim7.ico
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -23,6 +25,11 @@ SOURCES += \
     storage/src/storagemanager.cpp \
     tcp/src/tcpclient.cpp \
     util/src/util.cpp \
+    widgets/src/friendinfowidget.cpp \
+    widgets/src/newfriendsitem.cpp \
+    widgets/src/newfriendswidget.cpp \
+    widgets/src/applyfrienddialog.cpp \
+    widgets/src/finduserwidget.cpp \
     widgets/src/loginwnd.cpp \
     widgets/src/friendlistitem.cpp \
     widgets/src/friendlistwidget.cpp \
@@ -36,10 +43,14 @@ SOURCES += \
     widgets/src/mainwnd.cpp
 
 HEADERS += \
+    global.h \
     appinit.h \
     storage/include/storagemanager.h \
     tcp/include/tcpclient.h \
     util/include/util.h \
+    widgets/include/friendinfowidget.h \
+    widgets/include/applyfrienddialog.h \
+    widgets/include/finduserwidget.h \
     widgets/include/loginwnd.h \
     widgets/include/friendlistitem.h \
     widgets/include/friendlistwidget.h \
@@ -50,9 +61,16 @@ HEADERS += \
     widgets/include/chatwidget.h \
     widgets/include/controlwidget.h \
     widgets/include/chatlistwidget.h \
-    widgets/include/mainwnd.h
+    widgets/include/mainwnd.h \
+    widgets/include/newfriendswidget.h \
+    widgets/include/newfriendsitem.h
 
 FORMS += \
+    widgets/ui/friendinfowidget.ui \
+    widgets/ui/newfriendsitem.ui \
+    widgets/ui/newfriendswidget.ui \
+    widgets/ui/applyfrienddialog.ui \
+    widgets/ui/finduserwidget.ui \
     widgets/ui/loginwnd.ui \
     widgets/ui/friendlistitem.ui \
     widgets/ui/friendlistwidget.ui \

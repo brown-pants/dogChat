@@ -1,9 +1,10 @@
 #include "Session.h"
 #include "LogicSystem.h"
+#include "Server.h"
 #include <iostream>
 
 Session::Session(boost::asio::io_context &io_context)
-    : m_socket(io_context), is_recv_head(true)
+    : m_socket(io_context), is_recv_head(true), user(""), is_writing(false)
 {
     
 }
@@ -16,6 +17,10 @@ void Session::start()
 void Session::close()
 {
     m_socket.close();
+    if (user != "") 
+    {
+        Server::__instance->offline(user);
+    }
 }
 
 void Session::do_read(int offset)
@@ -56,9 +61,15 @@ void Session::do_read(int offset)
                 is_recv_head = true;
             }
         }
+        else if (ec == boost::asio::error::eof)
+        {
+            std::cout << "session closed." << std::endl;
+            close();
+        }
         else
         {
             std::cout << "session read failed, error is " << ec.what() << std::endl;
+            close();
         }  
     });
 }
@@ -68,18 +79,25 @@ void Session::do_write()
     std::shared_ptr<Session> self = shared_from_this();
     std::lock_guard<std::mutex> lock(mtx);
     
-    if (sendQueue.empty()) return;
+    if (sendQueue.empty() || is_writing) return;
+
+    is_writing = true;
     const std::string &msg = sendQueue.front();
 
     boost::asio::async_write(m_socket, boost::asio::buffer(msg), [self, this](boost::system::error_code ec, std::size_t length) {
+        std::lock_guard<std::mutex> lock(mtx);
+        is_writing = false;
+
         if (ec)
         {
             std::cout << "session sent failed, error is " << ec.what() << std::endl;
+            return;
         }
-        std::lock_guard<std::mutex> lock(mtx);
+        
         sendQueue.pop();
         if (!sendQueue.empty())
         {
+            mtx.unlock();
             do_write();
         }
     });
@@ -91,4 +109,14 @@ void Session::write(const std::string &msg)
     sendQueue.push(msg);
     mtx.unlock();
     do_write();
+}
+
+void Session::setUser(const std::string &user)
+{
+    this->user = user;
+}
+
+std::string Session::curUser() const
+{
+    return user;
 }

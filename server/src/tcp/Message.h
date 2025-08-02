@@ -5,7 +5,7 @@
 class Message
 {
 public:
-    enum { max_data_len = 4294967296, head_len = 4 };
+    enum { max_data_len = 4294967300, head_len = 4 };
 
     Message();
     char *data()                { return m_data; }
