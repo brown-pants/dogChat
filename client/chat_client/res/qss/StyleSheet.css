@@ -3,6 +3,9 @@
 ***************/
 
 QPushButton,
+QLineEdit,
+QComboBox,
+QTextEdit
 QLabel
 {
     color: black;

@@ -13,6 +13,7 @@ class FriendInfoWidget : public QWidget
 
 public:
     explicit FriendInfoWidget(QWidget *parent = nullptr);
+    QString curUser() const;
     void setUser(const QString &user, const QPixmap &profile);
     ~FriendInfoWidget();
 

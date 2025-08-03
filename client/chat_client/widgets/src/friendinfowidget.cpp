@@ -10,6 +10,11 @@ FriendInfoWidget::FriendInfoWidget(QWidget *parent)
     ui->setupUi(this);
 }
 
+QString FriendInfoWidget::curUser() const
+{
+    return user;
+}
+
 FriendInfoWidget::~FriendInfoWidget()
 {
     delete ui;

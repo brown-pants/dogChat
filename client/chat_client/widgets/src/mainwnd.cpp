@@ -171,6 +171,14 @@ MainWnd::MainWnd(QWidget *parent) : QWidget(parent)
         }
     });
 
+    connect(&TcpClient::GetInstance(), &TcpClient::sig_removeFriend_over, this, [this](const QString &user){
+        if (ui->rightStackedWidget->currentWidget() == m_FriendInfoWidget && m_FriendInfoWidget->curUser() == user)
+        {
+            ui->rightStackedWidget->setCurrentWidget(ui->homePage);
+            p_curFriendWidget = ui->homePage;
+        }
+    });
+
     ui->profileButton->installEventFilter(this);
 
 }
