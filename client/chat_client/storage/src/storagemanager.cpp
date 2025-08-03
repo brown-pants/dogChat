@@ -126,7 +126,7 @@ void StorageManager::loadChatMsg(const QString &cur_user, const QString &userB)
     QDir dir(root_dir + "Users/" + cur_user + "/ChatMsg/");
     if (!dir.exists())
     {
-        dir.mkdir(".");
+        dir.mkpath(".");
     }
 
     QString path = dir.path() + "/" + userB + ".json";

@@ -2,6 +2,12 @@
     全局样式表
 ***************/
 
+QPushButton,
+QLabel
+{
+    color: black;
+}
+
 /* 列表 */
 QListView
 {

@@ -5,7 +5,7 @@
 #include <QJsonObject>
 
 TcpClient::TcpClient()
-    : _b_recv_pending(false)
+    : QObject(nullptr), _b_recv_pending(false)
 {
     _thread = new QThread;
     this->moveToThread(_thread);

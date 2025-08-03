@@ -30,7 +30,7 @@ ApplyFriendDialog::ApplyFriendDialog(QWidget *parent)
     // 窗口可移动
     setProperty("canMove", true);
 
-    connect(&TcpClient::GetInstance(), &TcpClient::sig_applyFriend_over, [this](const QString &status){
+    connect(&TcpClient::GetInstance(), &TcpClient::sig_applyFriend_over, this, [this](const QString &status){
         QString text;
         if (status == "success")
         {
