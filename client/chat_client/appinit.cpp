@@ -28,6 +28,9 @@ void AppInit::Init()
         qDebug() << "样式表加载失败" << Qt::endl;
     }
 
+    QPalette  palette;
+    palette.setColor(QPalette::Text, Qt::black); // 设置字体颜色为红色
+    qApp->setPalette(palette);
 
     // 注册全局事件过滤器
     qApp->installEventFilter(&appInit);

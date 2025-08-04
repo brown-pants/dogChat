@@ -48,6 +48,7 @@ public:
     void addChatMsg(const QString &user, ChatMsgInfo info);
     int chatMsgCount(const QString &user);
     void saveChatMsg(const QString &curUser, const QString &user);
+    void setChatMsgFail(const QString &user, const QString &msg_id);
 
     QString saveFile(const QString &userA, const QString &userB, const QString &fileName, const QByteArray &data);
 

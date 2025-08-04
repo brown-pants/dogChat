@@ -62,6 +62,15 @@ ChatWidget::ChatWidget(QWidget *parent)
             ui->chatMsgListWidget->takeItem(ui->chatMsgListWidget->row(item));
         }
     });
+
+    connect(&TcpClient::GetInstance(), &TcpClient::sig_sendMsgFail, this, [this](const QString &user, const QString &msg_id){
+        qDebug() << msg_id << " send fail" << Qt::endl;
+        if (m_curUser == user)
+        {
+            m_msgItems[msg_id]->showExclamationButton();
+        }
+        emit sendFail(user, msg_id);
+    });
 }
 
 ChatWidget::~ChatWidget()
@@ -112,13 +121,19 @@ void ChatWidget::loadMsg(const QString &user)
         // 获取头像
         const QPixmap &profile = msg.self ? MainWnd::GetInstance()->curUserProfile() : MainWnd::GetInstance()->getUserProfile(msg.user);
 
+        ChatMsgItem *p_msgItem = nullptr;
         if (msg.type == "text")
         {
-            addTextMsg(msg.self, profile, msg.msg, counter ++);
+            p_msgItem = addTextMsg(msg.self, profile, msg.msg, counter ++);
         }
         else
         {
-            addFileMsg(msg.self, profile, msg.msg, counter ++);
+            p_msgItem = addFileMsg(msg.self, profile, msg.msg, counter ++);
+        }
+        m_msgItems.insert(msg.id, p_msgItem);
+        if (!msg.send_succ)
+        {
+            p_msgItem->showExclamationButton();
         }
     }
     if (msgRow < cnt)
@@ -129,6 +144,7 @@ void ChatWidget::loadMsg(const QString &user)
 
 void ChatWidget::clearMsg()
 {
+    m_msgItems.clear();
     while (ui->chatMsgListWidget->count() != 0)
     {
         QListWidgetItem *item = ui->chatMsgListWidget->takeItem(0);
@@ -140,17 +156,18 @@ void ChatWidget::clearMsg()
 void ChatWidget::sendFileMsg(const QString &url)
 {
     const QString &time = QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm");
+    QString msg_id = QUuid::createUuid().toString();
 
     if (url.mid(0, 1) == ":")
     {// 内置表情
-        ChatMsgInfo msgInfo(time, "file", url, MainWnd::GetInstance()->curUser(), true);
+        ChatMsgInfo msgInfo(msg_id, time, "file", url, MainWnd::GetInstance()->curUser(), true, true);
 
         appendMsg(msgInfo);
         emit sendMsg(curUser(), msgInfo);
 
         if (m_curUser != MainWnd::GetInstance()->curUser())
         {// 发送至服务器
-            TcpClient::GetInstance().SendMsg(QString::number(++ sendMsgCnter), m_curUser, time, url, true);
+            TcpClient::GetInstance().SendMsg(msg_id, m_curUser, time, url, true);
         }
     }
     else
@@ -159,17 +176,17 @@ void ChatWidget::sendFileMsg(const QString &url)
         // 保存文件并获取路径
         QString newUrl = StorageManager::GetInstance().saveFile(MainWnd::GetInstance()->curUser(), m_curUser, fileName, Util::FileToByteArray(url));
 
-        ChatMsgInfo msgInfo(time, "file", newUrl, MainWnd::GetInstance()->curUser(), true);
+        ChatMsgInfo msgInfo(msg_id, time, "file", newUrl, MainWnd::GetInstance()->curUser(), true, true);
         appendMsg(msgInfo);
         emit sendMsg(curUser(), msgInfo);   // 传输文件名和Base64数据 如 sad.png ABC
 
         // FileToBase64很慢 多线程防止阻塞窗口渲染
         QFutureWatcher<QString> *watcher = new QFutureWatcher<QString>(this);
-        connect(watcher, &QFutureWatcher<QString>::finished, this, [watcher, time, this]() {
+        connect(watcher, &QFutureWatcher<QString>::finished, this, [watcher, msg_id, time, this]() {
             QString send_msg = watcher->result();
             if (m_curUser != MainWnd::GetInstance()->curUser())
             {// 发送至服务器
-                TcpClient::GetInstance().SendMsg(QString::number(++ sendMsgCnter), m_curUser, time, send_msg, true);
+                TcpClient::GetInstance().SendMsg(msg_id, m_curUser, time, send_msg, true);
             }
             watcher->deleteLater();
         });
@@ -219,19 +236,25 @@ void ChatWidget::appendMsg(ChatMsgInfo msg)
     // 获取头像
     const QPixmap &profile = msg.self ? MainWnd::GetInstance()->curUserProfile() : MainWnd::GetInstance()->getUserProfile(msg.user);
 
+    ChatMsgItem *p_msgItem = nullptr;
     if (msg.type == "text")
     {
-        addTextMsg(msg.self, profile, msg.msg);
+        p_msgItem = addTextMsg(msg.self, profile, msg.msg);
     }
     else
     {
-        addFileMsg(msg.self, profile, msg.msg);
+        p_msgItem = addFileMsg(msg.self, profile, msg.msg);
+    }
+    m_msgItems.insert(msg.id, p_msgItem);
+    if (!msg.send_succ)
+    {
+        p_msgItem->showExclamationButton();
     }
 
     ui->chatMsgListWidget->scrollToBottom();
 }
 
-void ChatWidget::addTextMsg(bool myMsg, const QPixmap &profile, const QString &text, int row)
+ChatMsgItem *ChatWidget::addTextMsg(bool myMsg, const QPixmap &profile, const QString &text, int row)
 {
     QListWidgetItem *item = new QListWidgetItem();
 
@@ -247,9 +270,10 @@ void ChatWidget::addTextMsg(bool myMsg, const QPixmap &profile, const QString &t
         ui->chatMsgListWidget->insertItem(row, item);
     }
     ui->chatMsgListWidget->setItemWidget(item, pItemWidget);
+    return pItemWidget;
 }
 
-void ChatWidget::addFileMsg(bool myMsg, const QPixmap &profile, const QString &url, int row)
+ChatMsgItem *ChatWidget::addFileMsg(bool myMsg, const QPixmap &profile, const QString &url, int row)
 {
     QListWidgetItem *item = new QListWidgetItem();
 
@@ -265,6 +289,7 @@ void ChatWidget::addFileMsg(bool myMsg, const QPixmap &profile, const QString &u
         ui->chatMsgListWidget->insertItem(row, item);
     }
     ui->chatMsgListWidget->setItemWidget(item, pItemWidget);
+    return pItemWidget;
 }
 
 void ChatWidget::addTime(const QString &time, int row)
@@ -297,16 +322,18 @@ void ChatWidget::addLoadOld(int row)
 void ChatWidget::on_sendButton_clicked()
 {
     const QString &text = ui->msgTextEdit->document()->toPlainText();
+    QString msg_id = QUuid::createUuid().toString();
+
     if (text != "")
     {
         const QString &time = QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm");
-        ChatMsgInfo msgInfo(time, "text", text, MainWnd::GetInstance()->curUser(), true);
+        ChatMsgInfo msgInfo(msg_id, time, "text", text, MainWnd::GetInstance()->curUser(), true, true);
         appendMsg(msgInfo);
         ui->msgTextEdit->clear();
 
         if (m_curUser != MainWnd::GetInstance()->curUser())
         {// 发送至服务器
-            TcpClient::GetInstance().SendMsg(QString::number(++ sendMsgCnter), m_curUser, time, text, false);
+            TcpClient::GetInstance().SendMsg(msg_id, m_curUser, time, text, false);
         }
 
         emit sendMsg(curUser(), msgInfo);

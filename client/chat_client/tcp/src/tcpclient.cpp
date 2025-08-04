@@ -189,6 +189,17 @@ void TcpClient::handleMsg(const QByteArray &body)
             {
                 emit sig_offline();
             }
+            else if (type == "SendMsgFail")
+            {
+                QString _user, _id;
+                Util::JsonValueToString(obj["user"], [&](const QString &user){
+                    _user = user;
+                });
+                Util::JsonValueToString(obj["id"], [&](const QString &id){
+                    _id = id;
+                });
+                emit sig_sendMsgFail(_user, _id);
+            }
         });
     });
 }

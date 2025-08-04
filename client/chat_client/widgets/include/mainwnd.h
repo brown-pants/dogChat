@@ -67,6 +67,8 @@ private:
     QWidget *p_curChatWidget;
     QWidget *p_curFriendWidget;
 
+    QMutex mutex;
+
 signals:
     void sig_loadMsg(const QString &user, ChatMsgInfo msgInfo);
 };

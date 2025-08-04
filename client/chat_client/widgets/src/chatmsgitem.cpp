@@ -203,6 +203,11 @@ void ChatMsgItem::setFile(const QString &file_url)
     ui->msgWidget->installEventFilter(this);
 }
 
+void ChatMsgItem::showExclamationButton()
+{
+    ui->exclamationButton->show();
+}
+
 void ChatMsgItem::paintEvent(QPaintEvent *e)
 {
     if (msgType == ImageMsg) return;

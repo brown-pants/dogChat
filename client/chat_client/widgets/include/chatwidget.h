@@ -11,6 +11,7 @@
 
 #include "chooseemojiwidget.h"
 #include "global.h"
+#include "chatmsgitem.h"
 
 namespace Ui {
 class ChatWidget;
@@ -29,6 +30,7 @@ public:
 
 signals:
     void sendMsg(const QString &user, ChatMsgInfo msg);
+    void sendFail(const QString &user, const QString &msg_id);
 
 private slots:
     void on_sendButton_clicked();
@@ -46,10 +48,10 @@ private:
     QDateTime lastMsgTime;
     QDateTime _LastMsgTime;
     int msgRow;
-    int sendMsgCnter = 0;
+    QMap<QString, ChatMsgItem *> m_msgItems;
 
-    void addTextMsg(bool myMsg, const QPixmap &profile, const QString &text, int row = -1);
-    void addFileMsg(bool myMsg, const QPixmap &profile, const QString &url, int row = -1);
+    ChatMsgItem *addTextMsg(bool myMsg, const QPixmap &profile, const QString &text, int row = -1);
+    ChatMsgItem *addFileMsg(bool myMsg, const QPixmap &profile, const QString &url, int row = -1);
     void addTime(const QString &time, int row = -1);
     void addLoadOld(int row);
     void loadMsg(const QString &user);

@@ -483,9 +483,13 @@ void LogicSystem::SendMsg(const std::string &msgId, const std::string &user, con
 
     if (!MysqlDao::GetInstance().IsFriend(userB, userA))
     {
+        std::cout << userB << " is not " << userA << "'s friend" << std::endl;;
         nlohmann::json json;
         json["type"] = "SendMsgFail";
+        json["user"] = user;
         json["id"] = msgId;
+        const std::string &json_str = json.dump();
+        session->write(toTcpData(json_str));
         return;
     }
 

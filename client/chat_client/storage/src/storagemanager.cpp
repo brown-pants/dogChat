@@ -152,10 +152,12 @@ ChatMsgInfo StorageManager::getChatMsg(const QString &user, int row)
 {
     ChatMsgInfo msg;
     Util::JsonValueToObj(chatMsg[user][row], [&msg](QJsonObject obj){
+        msg.id = obj["id"].toString();
         msg.time = obj["time"].toString();
         msg.type = obj["type"].toString();
         msg.msg = obj["msg"].toString();
         msg.user = obj["user"].toString();
+        msg.send_succ = obj["send_succ"].toBool();
         msg.self = obj["self"].toBool();
     });
     return msg;
@@ -164,10 +166,12 @@ ChatMsgInfo StorageManager::getChatMsg(const QString &user, int row)
 void StorageManager::addChatMsg(const QString &user, ChatMsgInfo info)
 {
     QJsonObject json;
+    json["id"] = info.id;
     json["time"] = info.time;
     json["type"] = info.type;
     json["msg"] = info.msg;
     json["user"] = info.user;
+    json["send_succ"] = info.send_succ;
     json["self"] = info.self;
     chatMsg[user].push_front(json);
 }
@@ -190,6 +194,22 @@ void StorageManager::saveChatMsg(const QString &curUser, const QString &user)
         QJsonDocument doc = QJsonDocument(chatMsg[user]);
         chatMsg_file.write(doc.toJson());
         chatMsg_file.close();
+    }
+}
+
+void StorageManager::setChatMsgFail(const QString &user, const QString &msg_id)
+{
+    QJsonArray arr = chatMsg[user];
+    for (int i = 0; i < arr.size(); ++i)
+    {
+        QJsonObject msgObj = arr[i].toObject();
+        if (msgObj["id"].toString() == msg_id)
+        {
+            msgObj["send_succ"] = false;
+            arr.replace(i, msgObj);
+            chatMsg[user] = arr;
+            break;
+        }
     }
 }
 

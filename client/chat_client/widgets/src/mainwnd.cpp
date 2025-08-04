@@ -179,6 +179,12 @@ MainWnd::MainWnd(QWidget *parent) : QWidget(parent)
         }
     });
 
+    connect(m_ChatWidget, &ChatWidget::sendFail, this, [this](const QString &user, const QString &msg_id){
+        QMutexLocker locker(&mutex);
+        StorageManager::GetInstance().setChatMsgFail(user, msg_id);
+        StorageManager::GetInstance().saveChatMsg(curr_user, user);
+    });
+
     ui->profileButton->installEventFilter(this);
 
 }
@@ -267,7 +273,8 @@ void MainWnd::on_profileButton_clicked()
 
 void MainWnd::RecvMsg(const QString &user, const QString &time, const QString &msg, bool file_msg)
 {
-    ChatMsgInfo msgInfo(time, "text", msg, user, false);
+    QString msg_id = QUuid::createUuid().toString();
+    ChatMsgInfo msgInfo(msg_id, time, "text", msg, user, true, false);
 
     if (file_msg)
     {
@@ -328,6 +335,7 @@ void MainWnd::loadMsg(const QString &user, ChatMsgInfo msg)
     });
 
     QFuture<void> future = QtConcurrent::run([=]() {
+        QMutexLocker locker(&mutex);
         StorageManager::GetInstance().loadChatMsg(curr_user, user);
         StorageManager::GetInstance().addChatMsg(user, msg);
         StorageManager::GetInstance().saveChatMsg(curr_user, user);
@@ -360,15 +368,15 @@ void MainWnd::toChat(const QString &user)
         m_ChatListWidget->insertChatItem(profile, user, "", "", 0);
     }
 
+    p_curChatWidget = m_ChatWidget;
+    on_chatButton_clicked();
+
     // 加载聊天
     if (m_ChatWidget->curUser() != user)
     {
         m_ChatWidget->loadMessages(user);
     }
 
-    on_chatButton_clicked();
-    ui->rightStackedWidget->setCurrentWidget(m_ChatWidget);
-    p_curChatWidget = m_ChatWidget;
     if (row >= 0)
     {
         StorageManager::GetInstance().removeFromChatList(row);
@@ -445,9 +453,10 @@ void MainWndLoader::load_chatList()
 {
     StorageManager::GetInstance().loadChatList(mainwnd->curUser());
     const QVector<QString> &chatList = StorageManager::GetInstance().chatList();
+    int row = 0;
     for (const QString &user : chatList)
     {
-        const QPixmap &profile = (user == mainwnd->curUser() ? mainwnd->user_profile : mainwnd->m_FriendListWidget->getFriendProfile(user));
+        const QPixmap &profile = mainwnd->getUserProfile(user);
         if (!profile.isNull())
         {
             StorageManager::GetInstance().loadChatMsg(mainwnd->curUser(), user);
@@ -461,5 +470,10 @@ void MainWndLoader::load_chatList()
                 emit mainwnd->m_ChatListWidget->sig_insertChatItem(profile, user, msg.type == "text" ? msg.msg : "[文件]", msg.time);
             }
         }
+        else
+        {
+            StorageManager::GetInstance().removeFromChatList(row);
+        }
+        row ++;
     }
 }

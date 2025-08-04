@@ -26,12 +26,14 @@ struct FriendInfo
 struct ChatMsgInfo
 {
     ChatMsgInfo() {}
-    ChatMsgInfo(const QString &time, const QString &type, const QString &msg, const QString &user, bool self)
-        : time(time), type(type), msg(msg), user(user), self(self) {}
+    ChatMsgInfo(const QString &id, const QString &time, const QString &type, const QString &msg, const QString &user, bool send_succ, bool self)
+        : id(id), time(time), type(type), msg(msg), user(user), send_succ(send_succ), self(self) {}
+    QString id;
     QString time;
     QString type;
     QString msg;
     QString user;
+    bool send_succ;
     bool self;
 };
 

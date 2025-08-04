@@ -31,6 +31,8 @@ public:
     void setText(const QString &text);
     void setFile(const QString &file_url);
 
+    void showExclamationButton();
+
 protected:
     void paintEvent(QPaintEvent *e);
     bool eventFilter(QObject *obj, QEvent *event);

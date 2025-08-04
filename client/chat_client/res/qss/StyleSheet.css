@@ -2,15 +2,6 @@
     全局样式表
 ***************/
 
-QPushButton,
-QLineEdit,
-QComboBox,
-QTextEdit
-QLabel
-{
-    color: black;
-}
-
 /* 列表 */
 QListView
 {
@@ -141,9 +132,7 @@ QScrollBar::sub-line:vertical{
 #titleWidget
 {
     background-color: rgb(246, 246, 247);
-    border: 1px solid rgb(230, 231, 232);
-    border-top: none;
-    border-right: none;
+    border-bottom: 1px solid rgb(230, 231, 232);
 }
 
 #titleWidget QLabel

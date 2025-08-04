@@ -77,6 +77,7 @@ signals:
     void sig_recvMsg(const QString &user, const QString &time, const QString &msg, bool file_msg);
     void sig_loadWaitMsg();
     void sig_offline();
+    void sig_sendMsgFail(const QString &user, const QString &msg_id);
 
 private:
     QThread *_thread;
