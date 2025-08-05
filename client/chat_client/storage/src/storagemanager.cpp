@@ -176,6 +176,21 @@ void StorageManager::addChatMsg(const QString &user, ChatMsgInfo info)
     chatMsg[user].push_front(json);
 }
 
+void StorageManager::removeChatMsg(const QString &user, const QString &id)
+{
+    QJsonArray arr = chatMsg[user];
+    for (int i = 0; i < arr.size(); ++i)
+    {
+        QJsonObject msgObj = arr[i].toObject();
+        if (msgObj["id"].toString() == id)
+        {
+            arr.removeAt(i);
+            chatMsg[user] = arr;
+            break;
+        }
+    }
+}
+
 int StorageManager::chatMsgCount(const QString &user)
 {
     return chatMsg[user].count();

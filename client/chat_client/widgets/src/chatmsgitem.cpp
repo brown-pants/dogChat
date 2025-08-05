@@ -311,3 +311,9 @@ void ChatMsgItem::openDir()
         QMessageBox::critical(this, "错误", "文件夹不存在");
     }
 }
+
+void ChatMsgItem::on_exclamationButton_clicked()
+{
+    emit resend();
+}
+

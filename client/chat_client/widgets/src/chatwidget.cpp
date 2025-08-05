@@ -124,11 +124,11 @@ void ChatWidget::loadMsg(const QString &user)
         ChatMsgItem *p_msgItem = nullptr;
         if (msg.type == "text")
         {
-            p_msgItem = addTextMsg(msg.self, profile, msg.msg, counter ++);
+            p_msgItem = addTextMsg(msg.id, msg.self, profile, msg.msg, counter ++);
         }
         else
         {
-            p_msgItem = addFileMsg(msg.self, profile, msg.msg, counter ++);
+            p_msgItem = addFileMsg(msg.id, msg.self, profile, msg.msg, counter ++);
         }
         m_msgItems.insert(msg.id, p_msgItem);
         if (!msg.send_succ)
@@ -198,6 +198,22 @@ void ChatWidget::sendFileMsg(const QString &url)
     }
 }
 
+void ChatWidget::sendTextMsg(const QString &text)
+{
+    QString msg_id = QUuid::createUuid().toString();
+    const QString &time = QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm");
+    ChatMsgInfo msgInfo(msg_id, time, "text", text, MainWnd::GetInstance()->curUser(), true, true);
+    appendMsg(msgInfo);
+    ui->msgTextEdit->clear();
+
+    if (m_curUser != MainWnd::GetInstance()->curUser())
+    {// 发送至服务器
+        TcpClient::GetInstance().SendMsg(msg_id, m_curUser, time, text, false);
+    }
+
+    emit sendMsg(curUser(), msgInfo);
+}
+
 void ChatWidget::loadMessages(const QString &user)
 {
     clearMsg();
@@ -239,11 +255,11 @@ void ChatWidget::appendMsg(ChatMsgInfo msg)
     ChatMsgItem *p_msgItem = nullptr;
     if (msg.type == "text")
     {
-        p_msgItem = addTextMsg(msg.self, profile, msg.msg);
+        p_msgItem = addTextMsg(msg.id, msg.self, profile, msg.msg);
     }
     else
     {
-        p_msgItem = addFileMsg(msg.self, profile, msg.msg);
+        p_msgItem = addFileMsg(msg.id, msg.self, profile, msg.msg);
     }
     m_msgItems.insert(msg.id, p_msgItem);
     if (!msg.send_succ)
@@ -254,11 +270,19 @@ void ChatWidget::appendMsg(ChatMsgInfo msg)
     ui->chatMsgListWidget->scrollToBottom();
 }
 
-ChatMsgItem *ChatWidget::addTextMsg(bool myMsg, const QPixmap &profile, const QString &text, int row)
+ChatMsgItem *ChatWidget::addTextMsg(const QString &id, bool myMsg, const QPixmap &profile, const QString &text, int row)
 {
     QListWidgetItem *item = new QListWidgetItem();
 
     ChatMsgItem *pItemWidget = new ChatMsgItem(myMsg, profile, item, ui->chatMsgListWidget);
+
+    connect(pItemWidget, &ChatMsgItem::resend, this, [this, pItemWidget, item, text, id](){
+        delete ui->chatMsgListWidget->takeItem(ui->chatMsgListWidget->row(item));
+        delete pItemWidget;
+        emit resendMsg(m_curUser, id);
+        sendTextMsg(text);
+    });
+
     pItemWidget->setText(text);
 
     if (row < 0)
@@ -273,11 +297,19 @@ ChatMsgItem *ChatWidget::addTextMsg(bool myMsg, const QPixmap &profile, const QS
     return pItemWidget;
 }
 
-ChatMsgItem *ChatWidget::addFileMsg(bool myMsg, const QPixmap &profile, const QString &url, int row)
+ChatMsgItem *ChatWidget::addFileMsg(const QString &id, bool myMsg, const QPixmap &profile, const QString &url, int row)
 {
     QListWidgetItem *item = new QListWidgetItem();
 
     ChatMsgItem *pItemWidget = new ChatMsgItem(myMsg, profile, item, ui->chatMsgListWidget);
+
+    connect(pItemWidget, &ChatMsgItem::resend, this, [this, pItemWidget, item, url, id](){
+        delete ui->chatMsgListWidget->takeItem(ui->chatMsgListWidget->row(item));
+        delete pItemWidget;
+        emit resendMsg(m_curUser, id);
+        sendFileMsg(url);
+    });
+
     pItemWidget->setFile(url);
 
     if (row < 0)
@@ -322,21 +354,10 @@ void ChatWidget::addLoadOld(int row)
 void ChatWidget::on_sendButton_clicked()
 {
     const QString &text = ui->msgTextEdit->document()->toPlainText();
-    QString msg_id = QUuid::createUuid().toString();
 
     if (text != "")
     {
-        const QString &time = QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm");
-        ChatMsgInfo msgInfo(msg_id, time, "text", text, MainWnd::GetInstance()->curUser(), true, true);
-        appendMsg(msgInfo);
-        ui->msgTextEdit->clear();
-
-        if (m_curUser != MainWnd::GetInstance()->curUser())
-        {// 发送至服务器
-            TcpClient::GetInstance().SendMsg(msg_id, m_curUser, time, text, false);
-        }
-
-        emit sendMsg(curUser(), msgInfo);
+        sendTextMsg(text);
     }
 }
 

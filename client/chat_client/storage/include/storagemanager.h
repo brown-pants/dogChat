@@ -46,6 +46,7 @@ public:
     void loadChatMsg(const QString &cur_user, const QString &userB);
     ChatMsgInfo getChatMsg(const QString &user, int row);
     void addChatMsg(const QString &user, ChatMsgInfo info);
+    void removeChatMsg(const QString &user, const QString &id);
     int chatMsgCount(const QString &user);
     void saveChatMsg(const QString &curUser, const QString &user);
     void setChatMsgFail(const QString &user, const QString &msg_id);

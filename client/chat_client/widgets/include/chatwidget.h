@@ -31,6 +31,7 @@ public:
 signals:
     void sendMsg(const QString &user, ChatMsgInfo msg);
     void sendFail(const QString &user, const QString &msg_id);
+    void resendMsg(const QString &user, const QString &msg_id);
 
 private slots:
     void on_sendButton_clicked();
@@ -50,13 +51,14 @@ private:
     int msgRow;
     QMap<QString, ChatMsgItem *> m_msgItems;
 
-    ChatMsgItem *addTextMsg(bool myMsg, const QPixmap &profile, const QString &text, int row = -1);
-    ChatMsgItem *addFileMsg(bool myMsg, const QPixmap &profile, const QString &url, int row = -1);
+    ChatMsgItem *addTextMsg(const QString &id, bool myMsg, const QPixmap &profile, const QString &text, int row = -1);
+    ChatMsgItem *addFileMsg(const QString &id, bool myMsg, const QPixmap &profile, const QString &url, int row = -1);
     void addTime(const QString &time, int row = -1);
     void addLoadOld(int row);
     void loadMsg(const QString &user);
     void clearMsg();
     void sendFileMsg(const QString &url);
+    void sendTextMsg(const QString &text);
 };
 
 #endif // CHATWIDGET_H

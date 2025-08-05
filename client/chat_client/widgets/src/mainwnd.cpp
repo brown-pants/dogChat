@@ -185,6 +185,12 @@ MainWnd::MainWnd(QWidget *parent) : QWidget(parent)
         StorageManager::GetInstance().saveChatMsg(curr_user, user);
     });
 
+    connect(m_ChatWidget, &ChatWidget::resendMsg, this, [this](const QString &user, const QString &msg_id){
+        QMutexLocker locker(&mutex);
+        StorageManager::GetInstance().removeChatMsg(user, msg_id);
+        StorageManager::GetInstance().saveChatMsg(curr_user, user);
+    });
+
     ui->profileButton->installEventFilter(this);
 
 }
